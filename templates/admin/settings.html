@@ -781,6 +781,21 @@
 
         <hr class="form-divider">
 
+        <!-- Google Analytics Integration -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label><i class='bx bx-line-chart'></i> Site Analytics &amp; Tracking</label>
+                <span class="form-helper" style="margin-top:0;">Track visitor traffic, page views, and attendee engagement</span>
+            </div>
+            <div class="form-group">
+                <label for="settingGoogleAnalytics">Google Analytics Measurement ID (GA4)</label>
+                <input type="text" id="settingGoogleAnalytics" class="form-input" value="{{ settings.google_analytics_id | default('') }}" placeholder="e.g. G-XXXXXXXXXX">
+                <span class="form-helper">Enter your Google Analytics 4 Measurement ID to automatically track site visitors across all pages.</span>
+            </div>
+        </div>
+
+        <hr class="form-divider">
+
         <div class="form-group">
             <h4>Password Management</h4>
             <button type="button" class="btn btn-secondary" id="changePasswordBtn">

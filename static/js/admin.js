@@ -928,6 +928,7 @@
           announcement: ($('#settingAnnouncement') || {}).value || '',
           announcement_type: ($('#settingAnnouncementType') || {}).value || 'info',
           push_enabled: ($('#settingPushEnabled') || {}).checked ? 'true' : 'false',
+          google_analytics_id: ($('#settingGoogleAnalytics') || {}).value || '',
         };
         const res = await apiFetch(API.SETTINGS, { method: 'POST', body: JSON.stringify(data) });
         if (res) showToast('Advanced settings saved', 'success');

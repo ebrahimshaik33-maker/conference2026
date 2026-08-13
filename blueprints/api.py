@@ -590,6 +590,8 @@ def update_settings():
         'custom_heading_font', 'custom_body_font',
         # Push notification toggle
         'push_enabled',
+        # Analytics
+        'google_analytics_id',
     ]
 
     for key in text_keys:

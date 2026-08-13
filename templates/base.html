@@ -26,6 +26,18 @@
 
     {% block extra_head %}{% endblock %}
 
+    {# ── Google Analytics Integration ──────────────────────────────────── #}
+    {% if settings is defined and settings.google_analytics_id %}
+    <!-- Google Analytics (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ settings.google_analytics_id }}');
+    </script>
+    {% endif %}
+
     {# ── Branding & Custom-Theme CSS Overrides ─────────────────────────── #}
     {% if settings is defined %}
     <style id="brand-overrides">
