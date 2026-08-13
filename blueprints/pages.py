@@ -26,6 +26,22 @@ def service_worker():
     return response
 
 
+@pages_bp.route('/favicon.ico')
+def favicon():
+    """Serve favicon or logo, returning 204 No Content if missing to prevent 404s."""
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static')
+    fav = os.path.join(static_dir, 'favicon.ico')
+    if os.path.exists(fav):
+        return send_from_directory(static_dir, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    logo_setting = db.session.get(Setting, 'logo_path')
+    if logo_setting and logo_setting.value:
+        uploads_dir = os.path.join(static_dir, 'uploads')
+        logo_file = os.path.join(uploads_dir, logo_setting.value)
+        if os.path.exists(logo_file):
+            return send_from_directory(uploads_dir, logo_setting.value)
+    return ('', 204)
+
+
 @pages_bp.route('/')
 def index():
     settings = {s.key: s.value for s in Setting.query.all()}
