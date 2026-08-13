@@ -1,0 +1,828 @@
+{% extends "admin/admin_base.html" %}
+
+{% block page_title %}Settings{% endblock %}
+
+{% block admin_content %}
+<!-- Settings Tabs -->
+<div class="settings-tabs" role="tablist">
+    <button class="settings-tab active" data-tab="general" role="tab" aria-selected="true" aria-controls="tab-general" id="tab-btn-general">
+        <i class='bx bx-slider-alt'></i> General
+    </button>
+    <button class="settings-tab" data-tab="appearance" role="tab" aria-selected="false" aria-controls="tab-appearance" id="tab-btn-appearance">
+        <i class='bx bx-palette'></i> Appearance
+    </button>
+    <button class="settings-tab" data-tab="advanced" role="tab" aria-selected="false" aria-controls="tab-advanced" id="tab-btn-advanced">
+        <i class='bx bx-cog'></i> Advanced
+    </button>
+</div>
+
+<!-- General Tab -->
+<div class="settings-panel active" id="tab-general" role="tabpanel" aria-labelledby="tab-btn-general">
+    <form id="generalSettingsForm" class="settings-form">
+        <div class="form-group">
+            <label for="settingEventTitle">Event Title</label>
+            <input type="text" id="settingEventTitle" class="form-input" value="{{ settings.event_title | default('') }}">
+        </div>
+        <div class="form-group">
+            <label for="settingEventSubtitle">Event Subtitle</label>
+            <input type="text" id="settingEventSubtitle" class="form-input" value="{{ settings.event_subtitle | default('') }}">
+        </div>
+        <div class="form-group">
+            <label for="settingEventDescription">Event Description</label>
+            <textarea id="settingEventDescription" class="form-textarea" rows="3">{{ settings.event_description | default('') }}</textarea>
+        </div>
+        <!-- Layout -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>Schedule Layout</label>
+                <span class="form-helper" style="margin-top:0;">Controls how sessions are displayed on the public programme page</span>
+            </div>
+            <div class="layout-picker" id="layoutPicker">
+                <label class="layout-option {% if settings.layout == 'timeline' or not settings.layout %}layout-option-active{% endif %}">
+                    <input type="radio" name="layout" value="timeline" {% if settings.layout == 'timeline' or not settings.layout %}checked{% endif %}>
+                    <div class="layout-preview">
+                        <div class="lp-time-row"><span class="lp-time">09:00</span><div class="lp-card lp-card-tall"></div></div>
+                        <div class="lp-time-row"><span class="lp-time">10:00</span><div class="lp-card"></div></div>
+                        <div class="lp-time-row"><span class="lp-time">10:30</span><div class="lp-card lp-card-tall"></div></div>
+                    </div>
+                    <div class="layout-label">
+                        <strong>Timeline</strong>
+                        <span>Session cards stacked by time. Best for mobile.</span>
+                    </div>
+                </label>
+                <label class="layout-option {% if settings.layout == 'compact' %}layout-option-active{% endif %}">
+                    <input type="radio" name="layout" value="compact" {% if settings.layout == 'compact' %}checked{% endif %}>
+                    <div class="layout-preview">
+                        <div class="lp-list-row"><span class="lp-time">09:00</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
+                        <div class="lp-list-row"><span class="lp-time">09:45</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
+                        <div class="lp-list-row lp-list-break"><span class="lp-time">10:30</span><span class="lp-list-title lp-list-title-break"></span><span class="lp-list-room"></span></div>
+                        <div class="lp-list-row"><span class="lp-time">11:00</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
+                        <div class="lp-list-row"><span class="lp-time">11:45</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
+                    </div>
+                    <div class="layout-label">
+                        <strong>Compact List</strong>
+                        <span>Dense rows. Great for scanning many sessions quickly.</span>
+                    </div>
+                </label>
+                <label class="layout-option {% if settings.layout == 'grid' %}layout-option-active{% endif %}">
+                    <input type="radio" name="layout" value="grid" {% if settings.layout == 'grid' %}checked{% endif %}>
+                    <div class="layout-preview">
+                        <div class="lp-grid-header"><span></span><span class="lp-col-head"></span><span class="lp-col-head"></span><span class="lp-col-head"></span></div>
+                        <div class="lp-grid-row"><span class="lp-time">09:00</span><div class="lp-grid-cell lp-grid-cell-span"></div><div class="lp-grid-cell"></div><div class="lp-grid-cell lp-grid-cell-span"></div></div>
+                        <div class="lp-grid-row"><span class="lp-time">10:00</span><div class="lp-grid-cell"></div><div class="lp-grid-cell lp-grid-cell-span"></div><div class="lp-grid-cell"></div></div>
+                    </div>
+                    <div class="layout-label">
+                        <strong>Track Grid</strong>
+                        <span>Columns by track. Auto-switches to Timeline on mobile.</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="toggle-label">
+                    <span>Show Top Header Banner</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="settingShowTopBanner" {% if settings.show_top_banner != 'false' %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="toggle-label">
+                    <span>Show Footer Banner</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="settingShowFooterBanner" {% if settings.show_footer_banner != 'false' %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+        </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="toggle-label">
+                    <span>Show Top Header Banner</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="settingShowTopBanner" {% if settings.show_top_banner != 'false' %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="toggle-label">
+                    <span>Show Footer Banner</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="settingShowFooterBanner" {% if settings.show_footer_banner != 'false' %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="settingStartDate">Start Date</label>
+                <input type="date" id="settingStartDate" class="form-input" value="{{ settings.event_start_date | default('') }}">
+            </div>
+            <div class="form-group">
+                <label for="settingDays">Number of Days</label>
+                <input type="number" id="settingDays" class="form-input" min="1" max="14" value="{{ settings.event_days | default('4') }}">
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="toggle-label">
+                    <span>Show Track Filter</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="settingShowTrack" {% if settings.show_track_filter == 'true' %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="toggle-label">
+                    <span>Show Evaluation Links</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="settingShowEval" {% if settings.show_evaluation_links == 'true' %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+        <div class="form-group">
+            <label for="settingFooterText">Footer Copyright Text</label>
+            <input type="text" id="settingFooterText" class="form-input" placeholder="e.g. &copy; Durban University of Technology &middot; Digital Programme" value="{{ settings.footer_text | default('') }}">
+            <span class="form-helper">Custom text for website footer. Leave blank to dynamically use &copy; [Event Title] &middot; Digital Programme.</span>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-primary" id="saveGeneralBtn">
+                <i class='bx bx-save'></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Appearance Tab -->
+<div class="settings-panel" id="tab-appearance" role="tabpanel" aria-labelledby="tab-btn-appearance" style="display:none;">
+    <form id="appearanceSettingsForm" class="settings-form">
+        <div class="form-group">
+            <label>Theme</label>
+            <div class="theme-grid" id="themeGrid">
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-dut-dark" {% if settings.theme == 'theme-dut-dark' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-dut-dark">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">DUT Dark & Gold</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-corporate-blue" {% if settings.theme == 'theme-corporate-blue' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-corporate-blue">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Corporate Blue</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-wedding-elegant" {% if settings.theme == 'theme-wedding-elegant' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-wedding-elegant">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Elegant Wedding</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-neon-tech" {% if settings.theme == 'theme-neon-tech' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-neon-tech">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Neon Tech</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-scholarly-parchment" {% if settings.theme == 'theme-scholarly-parchment' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-scholarly-parchment">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Scholarly Parchment</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-eco-earthy" {% if settings.theme == 'theme-eco-earthy' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-eco-earthy">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Eco & Earthy</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-vibrant-creative" {% if settings.theme == 'theme-vibrant-creative' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-vibrant-creative">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Vibrant Creative</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-midnight-academic" {% if settings.theme == 'theme-midnight-academic' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-midnight-academic">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Midnight Academic</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-south-african" {% if settings.theme == 'theme-south-african' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-south-african">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Ubuntu (South African)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Advanced Themes -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>Advanced Themes</label>
+                <span class="form-helper" style="margin-top:0;">Inspired by leading conference platform design languages</span>
+            </div>
+            <div class="theme-grid" id="advancedThemeGrid">
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-fourwaves" {% if settings.theme == 'theme-adv-fourwaves' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-fourwaves">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Academic (Fourwaves)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-planby" {% if settings.theme == 'theme-adv-planby' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-planby">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">EPG Grid (Planby)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-itineri" {% if settings.theme == 'theme-adv-itineri' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-itineri">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Editorial (Itineri)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-pragma" {% if settings.theme == 'theme-adv-pragma' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-pragma">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Dark Board (Pragma)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-kleap" {% if settings.theme == 'theme-adv-kleap' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-kleap">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">AI Landing (Kleap)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-eventx" {% if settings.theme == 'theme-adv-eventx' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-eventx">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Enterprise AI (EventX)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-eventact" {% if settings.theme == 'theme-adv-eventact' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-eventact">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Interactive (Eventact)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- University & Institution Themes -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>University &amp; Institution Themes (White-Label)</label>
+                <span class="form-helper" style="margin-top:0;">Pre-configured brand presets for renting/selling to higher education clients</span>
+            </div>
+            <div class="theme-grid" id="universityThemeGrid">
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-dut" {% if settings.theme == 'theme-adv-dut' or not settings.theme %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-dut">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">DUT Official (Dark)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-dut-light" {% if settings.theme == 'theme-adv-dut-light' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-dut-light">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">DUT Official (Light Site)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-ukzn" {% if settings.theme == 'theme-adv-ukzn' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-ukzn">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">UKZN (KwaZulu-Natal)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-uct" {% if settings.theme == 'theme-adv-uct' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-uct">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">UCT (Cape Town)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-wits" {% if settings.theme == 'theme-adv-wits' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-wits">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Wits University</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-stellenbosch" {% if settings.theme == 'theme-adv-stellenbosch' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-stellenbosch">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">Stellenbosch (Maties)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-up" {% if settings.theme == 'theme-adv-up' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-up">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">UP (Pretoria Tuks)</span>
+                </label>
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-adv-unisa" {% if settings.theme == 'theme-adv-unisa' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-adv-unisa">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">UNISA (South Africa)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Custom Theme Option -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>Custom Theme Builder</label>
+                <span class="form-helper" style="margin-top:0;">Design your own colours, fonts, and background — perfect for any client</span>
+            </div>
+            <div class="theme-grid" id="customThemeGrid">
+                <label class="theme-option">
+                    <input type="radio" name="theme" value="theme-custom" {% if settings.theme == 'theme-custom' %}checked{% endif %}>
+                    <div class="theme-preview theme-preview-custom">
+                        <div class="tp-bar"></div><div class="tp-card"></div><div class="tp-card"></div>
+                    </div>
+                    <span class="theme-name">🎨 Custom Theme</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Branding Controls -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>Branding</label>
+                <span class="form-helper" style="margin-top:0;">Override title colour and fonts — works with any theme</span>
+            </div>
+            <div class="branding-section">
+                <div class="branding-row">
+                    <div class="form-group">
+                        <label for="settingBrandTitleColor">Event Title Colour</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="settingBrandTitleColor" value="{{ settings.brand_title_color | default('#ffffff') }}">
+                            <span class="ctb-color-value" id="brandTitleColorVal">{{ settings.brand_title_color | default('#ffffff') | upper }}</span>
+                        </div>
+                        <span class="form-helper">Colour of the event title text in the header</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="settingBrandHeadingFont">Heading Font</label>
+                        <select id="settingBrandHeadingFont" class="form-select">
+                            <option value="" {% if not settings.brand_heading_font %}selected{% endif %}>— Theme default —</option>
+                            <option value="Inter" {% if settings.brand_heading_font == 'Inter' %}selected{% endif %}>Inter</option>
+                            <option value="Open Sans" {% if settings.brand_heading_font == 'Open Sans' %}selected{% endif %}>Open Sans</option>
+                            <option value="Poppins" {% if settings.brand_heading_font == 'Poppins' %}selected{% endif %}>Poppins</option>
+                            <option value="Montserrat" {% if settings.brand_heading_font == 'Montserrat' %}selected{% endif %}>Montserrat</option>
+                            <option value="Playfair Display" {% if settings.brand_heading_font == 'Playfair Display' %}selected{% endif %}>Playfair Display</option>
+                            <option value="Libre Baskerville" {% if settings.brand_heading_font == 'Libre Baskerville' %}selected{% endif %}>Libre Baskerville</option>
+                            <option value="Source Serif 4" {% if settings.brand_heading_font == 'Source Serif 4' %}selected{% endif %}>Source Serif 4</option>
+                            <option value="Roboto" {% if settings.brand_heading_font == 'Roboto' %}selected{% endif %}>Roboto</option>
+                            <option value="Ubuntu" {% if settings.brand_heading_font == 'Ubuntu' %}selected{% endif %}>Ubuntu</option>
+                            <option value="Outfit" {% if settings.brand_heading_font == 'Outfit' %}selected{% endif %}>Outfit</option>
+                            <option value="Cinzel" {% if settings.brand_heading_font == 'Cinzel' %}selected{% endif %}>Cinzel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="settingBrandBodyFont">Body Font</label>
+                        <select id="settingBrandBodyFont" class="form-select">
+                            <option value="" {% if not settings.brand_body_font %}selected{% endif %}>— Theme default —</option>
+                            <option value="Inter" {% if settings.brand_body_font == 'Inter' %}selected{% endif %}>Inter</option>
+                            <option value="Open Sans" {% if settings.brand_body_font == 'Open Sans' %}selected{% endif %}>Open Sans</option>
+                            <option value="Roboto" {% if settings.brand_body_font == 'Roboto' %}selected{% endif %}>Roboto</option>
+                            <option value="Poppins" {% if settings.brand_body_font == 'Poppins' %}selected{% endif %}>Poppins</option>
+                            <option value="Montserrat" {% if settings.brand_body_font == 'Montserrat' %}selected{% endif %}>Montserrat</option>
+                            <option value="Ubuntu" {% if settings.brand_body_font == 'Ubuntu' %}selected{% endif %}>Ubuntu</option>
+                            <option value="Outfit" {% if settings.brand_body_font == 'Outfit' %}selected{% endif %}>Outfit</option>
+                            <option value="Source Serif 4" {% if settings.brand_body_font == 'Source Serif 4' %}selected{% endif %}>Source Serif 4</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Theme Builder Panel -->
+        <div class="form-group" id="customThemeBuilderPanel" style="{{ '' if settings.theme == 'theme-custom' else 'display:none;' }}">
+            <div class="advanced-themes-header">
+                <label>🎨 Custom Theme Colours &amp; Fonts</label>
+                <span class="form-helper" style="margin-top:0;">Adjust colours and fonts below — live preview updates as you choose</span>
+            </div>
+            <div class="custom-theme-builder" id="customThemeBuilder">
+
+                <!-- Colour Pickers -->
+                <div class="ctb-row">
+                    <div class="ctb-field">
+                        <label>Primary / Accent</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="ctbPrimary" value="{{ settings.custom_primary | default('#6366f1') }}">
+                            <span class="ctb-color-value" id="ctbPrimaryVal">{{ settings.custom_primary | default('#6366f1') | upper }}</span>
+                        </div>
+                    </div>
+                    <div class="ctb-field">
+                        <label>Accent Colour</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="ctbAccent" value="{{ settings.custom_accent | default('#8b5cf6') }}">
+                            <span class="ctb-color-value" id="ctbAccentVal">{{ settings.custom_accent | default('#8b5cf6') | upper }}</span>
+                        </div>
+                    </div>
+                    <div class="ctb-field">
+                        <label>Background</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="ctbBg" value="{{ settings.custom_bg | default('#0f0f1a') }}">
+                            <span class="ctb-color-value" id="ctbBgVal">{{ settings.custom_bg | default('#0f0f1a') | upper }}</span>
+                        </div>
+                    </div>
+                    <div class="ctb-field">
+                        <label>Card / Surface</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="ctbSurface" value="{{ settings.custom_surface | default('#1a1a2e') }}">
+                            <span class="ctb-color-value" id="ctbSurfaceVal">{{ settings.custom_surface | default('#1a1a2e') | upper }}</span>
+                        </div>
+                    </div>
+                    <div class="ctb-field">
+                        <label>Text Colour</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="ctbText" value="{{ settings.custom_text | default('#e2e2ff') }}">
+                            <span class="ctb-color-value" id="ctbTextVal">{{ settings.custom_text | default('#e2e2ff') | upper }}</span>
+                        </div>
+                    </div>
+                    <div class="ctb-field">
+                        <label>Header / Nav</label>
+                        <div class="ctb-color-wrap">
+                            <input type="color" id="ctbHeader" value="{{ settings.custom_header_bg | default('#0f0f1a') }}">
+                            <span class="ctb-color-value" id="ctbHeaderVal">{{ settings.custom_header_bg | default('#0f0f1a') | upper }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Font Selects -->
+                <div class="ctb-font-row">
+                    <div class="form-group">
+                        <label for="ctbHeadingFont">Heading Font</label>
+                        <select id="ctbHeadingFont" class="form-select">
+                            <option value="Inter" {% if settings.custom_heading_font == 'Inter' or not settings.custom_heading_font %}selected{% endif %}>Inter</option>
+                            <option value="Open Sans" {% if settings.custom_heading_font == 'Open Sans' %}selected{% endif %}>Open Sans</option>
+                            <option value="Poppins" {% if settings.custom_heading_font == 'Poppins' %}selected{% endif %}>Poppins</option>
+                            <option value="Montserrat" {% if settings.custom_heading_font == 'Montserrat' %}selected{% endif %}>Montserrat</option>
+                            <option value="Playfair Display" {% if settings.custom_heading_font == 'Playfair Display' %}selected{% endif %}>Playfair Display</option>
+                            <option value="Libre Baskerville" {% if settings.custom_heading_font == 'Libre Baskerville' %}selected{% endif %}>Libre Baskerville</option>
+                            <option value="Cinzel" {% if settings.custom_heading_font == 'Cinzel' %}selected{% endif %}>Cinzel (Classic)</option>
+                            <option value="Roboto" {% if settings.custom_heading_font == 'Roboto' %}selected{% endif %}>Roboto</option>
+                            <option value="Ubuntu" {% if settings.custom_heading_font == 'Ubuntu' %}selected{% endif %}>Ubuntu</option>
+                            <option value="Outfit" {% if settings.custom_heading_font == 'Outfit' %}selected{% endif %}>Outfit</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ctbBodyFont">Body Font</label>
+                        <select id="ctbBodyFont" class="form-select">
+                            <option value="Inter" {% if settings.custom_body_font == 'Inter' or not settings.custom_body_font %}selected{% endif %}>Inter</option>
+                            <option value="Open Sans" {% if settings.custom_body_font == 'Open Sans' %}selected{% endif %}>Open Sans</option>
+                            <option value="Roboto" {% if settings.custom_body_font == 'Roboto' %}selected{% endif %}>Roboto</option>
+                            <option value="Poppins" {% if settings.custom_body_font == 'Poppins' %}selected{% endif %}>Poppins</option>
+                            <option value="Montserrat" {% if settings.custom_body_font == 'Montserrat' %}selected{% endif %}>Montserrat</option>
+                            <option value="Ubuntu" {% if settings.custom_body_font == 'Ubuntu' %}selected{% endif %}>Ubuntu</option>
+                            <option value="Outfit" {% if settings.custom_body_font == 'Outfit' %}selected{% endif %}>Outfit</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Background Image -->
+                <div class="form-group">
+                    <label for="settingCustomBg">Background Image <span class="form-helper-inline">(optional)</span></label>
+                    <div class="file-upload-area" id="customBgUploadArea">
+                        <div class="upload-preview" id="customBgPreview">
+                            {% if settings.custom_bg_path %}
+                            <img src="{{ url_for('static', filename='uploads/' + settings.custom_bg_path) }}" alt="Background image">
+                            {% else %}
+                            <i class='bx bx-image-add'></i>
+                            <span>Drop image or click to upload</span>
+                            {% endif %}
+                        </div>
+                        <input type="file" id="settingCustomBg" accept=".png,.jpg,.jpeg,.webp" class="file-input">
+                        <div class="upload-actions">
+                            <button type="button" class="btn btn-secondary btn-sm" id="resetCustomBgBtn">Remove</button>
+                        </div>
+                    </div>
+                    <span class="form-helper">Full-page background image. For best results, use a 1920×1080 image.</span>
+                </div>
+
+                <!-- Live Mini Preview -->
+                <div class="ctb-preview-wrap">
+                    <label>Live Preview</label>
+                    <div class="ctb-mini-preview" id="ctbMiniPreview">
+                        <div class="ctb-mp-header" id="ctbMpHeader">My Conference 2025</div>
+                        <div class="ctb-mp-body" id="ctbMpBody">
+                            <div class="ctb-mp-card" id="ctbMpCard1"></div>
+                            <div class="ctb-mp-card ctb-mp-card-sm" id="ctbMpCard2"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- UI Style Picker -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>UI Style</label>
+                <span class="form-helper" style="margin-top:0;">Changes the visual feel of cards, borders &amp; shadows — works with any colour theme</span>
+            </div>
+            <div class="style-picker" id="stylePicker">
+                <label class="style-option">
+                    <input type="radio" name="ui_style" value="glass" {% if not settings.ui_style or settings.ui_style == 'glass' %}checked{% endif %}>
+                    <div class="style-preview sp-glass">
+                        <div class="sp-card sp-glass-card"></div>
+                        <div class="sp-card sp-glass-card sp-card-sm"></div>
+                    </div>
+                    <div class="style-label">
+                        <strong>Glass</strong>
+                        <span>Frosted blur, soft glow</span>
+                    </div>
+                </label>
+                <label class="style-option">
+                    <input type="radio" name="ui_style" value="flat" {% if settings.ui_style == 'flat' %}checked{% endif %}>
+                    <div class="style-preview sp-flat">
+                        <div class="sp-card sp-flat-card"></div>
+                        <div class="sp-card sp-flat-card sp-card-sm"></div>
+                    </div>
+                    <div class="style-label">
+                        <strong>Flat</strong>
+                        <span>Clean, no shadows</span>
+                    </div>
+                </label>
+                <label class="style-option">
+                    <input type="radio" name="ui_style" value="material" {% if settings.ui_style == 'material' %}checked{% endif %}>
+                    <div class="style-preview sp-material">
+                        <div class="sp-card sp-material-card"></div>
+                        <div class="sp-card sp-material-card sp-card-sm sp-card-elevated"></div>
+                    </div>
+                    <div class="style-label">
+                        <strong>Material</strong>
+                        <span>Elevation shadows, layered</span>
+                    </div>
+                </label>
+                <label class="style-option">
+                    <input type="radio" name="ui_style" value="brutalist" {% if settings.ui_style == 'brutalist' %}checked{% endif %}>
+                    <div class="style-preview sp-brutalist">
+                        <div class="sp-card sp-brutalist-card"></div>
+                        <div class="sp-card sp-brutalist-card sp-card-sm"></div>
+                    </div>
+                    <div class="style-label">
+                        <strong>Neubrutalist</strong>
+                        <span>Bold borders, hard shadow</span>
+                    </div>
+                </label>
+                <label class="style-option">
+                    <input type="radio" name="ui_style" value="minimal" {% if settings.ui_style == 'minimal' %}checked{% endif %}>
+                    <div class="style-preview sp-minimal">
+                        <div class="sp-card sp-minimal-card"></div>
+                        <div class="sp-card sp-minimal-card sp-card-sm"></div>
+                    </div>
+                    <div class="style-label">
+                        <strong>Minimalist</strong>
+                        <span>Invisible UI, pure spacing</span>
+                    </div>
+                </label>
+                <label class="style-option">
+                    <input type="radio" name="ui_style" value="neon" {% if settings.ui_style == 'neon' %}checked{% endif %}>
+                    <div class="style-preview sp-neon">
+                        <div class="sp-card sp-neon-card"></div>
+                        <div class="sp-card sp-neon-card sp-card-sm"></div>
+                    </div>
+                    <div class="style-label">
+                        <strong>Neon</strong>
+                        <span>Cyberpunk glow, angular</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Layout Picker -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>Schedule Layout</label>
+                <span class="form-helper" style="margin-top:0;">Controls how sessions appear on the public programme page</span>
+            </div>
+            <div class="layout-picker" id="layoutPicker">
+                <label class="layout-option">
+                    <input type="radio" name="layout" value="timeline" {% if not settings.layout or settings.layout == 'timeline' %}checked{% endif %}>
+                    <div class="layout-preview lp-timeline-preview">
+                        <div class="lp-time-row"><span class="lp-time"></span><div class="lp-card lp-card-tall"></div></div>
+                        <div class="lp-time-row"><span class="lp-time"></span><div class="lp-card"></div></div>
+                        <div class="lp-time-row"><span class="lp-time"></span><div class="lp-card lp-card-tall"></div></div>
+                    </div>
+                    <div class="layout-label">
+                        <strong>Timeline</strong>
+                        <span>Card view, grouped by time. Best for mobile.</span>
+                    </div>
+                </label>
+                <label class="layout-option">
+                    <input type="radio" name="layout" value="compact" {% if settings.layout == 'compact' %}checked{% endif %}>
+                    <div class="layout-preview lp-compact-preview">
+                        <div class="lp-list-row"><span class="lp-dot"></span><div class="lp-list-line"></div></div>
+                        <div class="lp-list-row"><span class="lp-dot"></span><div class="lp-list-line lp-list-line-short"></div></div>
+                        <div class="lp-list-row lp-list-row-break"><span class="lp-dot lp-dot-break"></span><div class="lp-list-line lp-list-line-break"></div></div>
+                        <div class="lp-list-row"><span class="lp-dot"></span><div class="lp-list-line lp-list-line-short"></div></div>
+                        <div class="lp-list-row"><span class="lp-dot"></span><div class="lp-list-line"></div></div>
+                    </div>
+                    <div class="layout-label">
+                        <strong>Compact List</strong>
+                        <span>Dense rows for quick scanning. Great for large programmes.</span>
+                    </div>
+                </label>
+                <label class="layout-option">
+                    <input type="radio" name="layout" value="grid" {% if settings.layout == 'grid' %}checked{% endif %}>
+                    <div class="layout-preview lp-grid-preview">
+                        <div class="lp-grid-head-row"><div class="lp-grid-col-h"></div><div class="lp-grid-col-h"></div><div class="lp-grid-col-h"></div></div>
+                        <div class="lp-grid-body-row"><div class="lp-grid-cell"></div><div class="lp-grid-cell lp-grid-cell-empty"></div><div class="lp-grid-cell"></div></div>
+                        <div class="lp-grid-body-row"><div class="lp-grid-cell lp-grid-cell-empty"></div><div class="lp-grid-cell lp-grid-cell-tall"></div><div class="lp-grid-cell"></div></div>
+                    </div>
+                    <div class="layout-label">
+                        <strong>Track Grid</strong>
+                        <span>Columns by track/room. Falls back to Timeline on mobile.</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="settingLogo">Logo</label>
+                <div class="file-upload-area" id="logoUploadArea">
+                    <div class="upload-preview" id="logoPreview">
+                        {% if settings.logo_path %}
+                        <img src="{{ url_for('static', filename='uploads/' + settings.logo_path) }}" alt="Current logo">
+                        {% else %}
+                        <i class='bx bx-image-add'></i>
+                        <span>Drop image or click to upload</span>
+                        {% endif %}
+                    </div>
+                    <input type="file" id="settingLogo" accept=".png,.jpg,.jpeg,.svg,.webp" class="file-input">
+                    <div class="upload-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" id="resetLogoBtn">Reset</button>
+                    </div>
+                </div>
+                <span class="form-helper">Max 400×200px, PNG/JPG/SVG/WEBP, 5MB max</span>
+            </div>
+            <div class="form-group">
+                <label for="settingBanner">Banner</label>
+                <div class="file-upload-area" id="bannerUploadArea">
+                    <div class="upload-preview" id="bannerPreview">
+                        {% if settings.banner_path %}
+                        <img src="{{ url_for('static', filename='uploads/' + settings.banner_path) }}" alt="Current banner">
+                        {% else %}
+                        <i class='bx bx-image-add'></i>
+                        <span>Drop image or click to upload</span>
+                        {% endif %}
+                    </div>
+                    <input type="file" id="settingBanner" accept=".png,.jpg,.jpeg,.svg,.webp" class="file-input">
+                    <div class="upload-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" id="resetBannerBtn">Reset</button>
+                    </div>
+                </div>
+                <span class="form-helper">Max 2000×400px, PNG/JPG/SVG/WEBP, 5MB max</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-primary" id="saveAppearanceBtn">
+                <i class='bx bx-save'></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Advanced Tab -->
+<div class="settings-panel" id="tab-advanced" role="tabpanel" aria-labelledby="tab-btn-advanced" style="display:none;">
+    <form id="advancedSettingsForm" class="settings-form">
+        <div class="form-group">
+            <label for="settingAnnouncement">Site-wide Announcement</label>
+            <input type="text" id="settingAnnouncement" class="form-input" value="{{ settings.announcement | default('') }}" placeholder="Leave empty for no announcement">
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="settingAnnouncementType">Announcement Type</label>
+                <select id="settingAnnouncementType" class="form-select">
+                    <option value="info" {% if settings.announcement_type == 'info' %}selected{% endif %}>ℹ️ Info</option>
+                    <option value="warning" {% if settings.announcement_type == 'warning' %}selected{% endif %}>⚠️ Warning</option>
+                    <option value="danger" {% if settings.announcement_type == 'danger' %}selected{% endif %}>🚨 Danger</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button type="button" class="btn btn-secondary" id="clearAdvAnnouncementBtn">
+                    <i class='bx bx-x'></i> Clear Announcement
+                </button>
+            </div>
+        </div>
+
+        <hr class="form-divider">
+
+        <!-- Push Notifications -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label><i class='bx bx-bell'></i> Push Notifications</label>
+                <span class="form-helper" style="margin-top:0;">Send real-time alerts to visitors who have opted in</span>
+            </div>
+            <div class="push-admin-card">
+                <div class="push-stats">
+                    <div class="push-stat">
+                        <span class="push-stat-num" id="pushSubscriberCount">—</span>
+                        <span class="push-stat-label">Subscribers</span>
+                    </div>
+                    <div class="push-stat">
+                        <span class="push-stat-num" id="pushSentCount">—</span>
+                        <span class="push-stat-label">Sent Total</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <span>Enable Push Notification Prompt on Site</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="settingPushEnabled" {% if settings.push_enabled == 'true' %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                    <span class="form-helper">When enabled, visitors will see a prompt asking to receive notifications about schedule changes.</span>
+                </div>
+                <div class="form-actions" style="margin-top: var(--space-3);">
+                    <button type="button" class="btn btn-primary" id="sendPushBtn">
+                        <i class='bx bx-send'></i> Send Notification to All Subscribers
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="form-divider">
+
+        <div class="form-group">
+            <h4>Password Management</h4>
+            <button type="button" class="btn btn-secondary" id="changePasswordBtn">
+                <i class='bx bx-lock'></i> Change Password
+            </button>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-primary" id="saveAdvancedBtn">
+                <i class='bx bx-save'></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Push Send Notification Modal -->
+<div class="modal-backdrop" id="pushModalBackdrop" style="display:none;"></div>
+<div class="admin-confirm-modal push-send-modal" id="pushModal" role="dialog" aria-modal="true" aria-labelledby="pushModalTitle" style="display:none;">
+    <div class="admin-modal-header">
+        <h3 id="pushModalTitle"><i class='bx bx-bell'></i> Send Push Notification</h3>
+        <button class="btn btn-icon" id="pushModalClose" aria-label="Close dialog">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+    <div class="admin-modal-body">
+        <div class="form-group">
+            <label for="pushTitle">Notification Title <span class="required">*</span></label>
+            <input type="text" id="pushTitle" class="form-input" placeholder="e.g. Session Update" maxlength="60">
+            <div class="push-char-count"><span id="pushTitleCount">0</span>/60</div>
+        </div>
+        <div class="form-group">
+            <label for="pushMessage">Message <span class="required">*</span></label>
+            <textarea id="pushMessage" class="form-textarea" rows="3" placeholder="e.g. Keynote moved to Main Hall — starts 09:30" maxlength="140"></textarea>
+            <div class="push-char-count"><span id="pushMsgCount">0</span>/140</div>
+        </div>
+        <p class="form-helper" id="pushRecipientInfo">Loading subscriber count...</p>
+    </div>
+    <div class="admin-modal-footer">
+        <button class="btn btn-secondary" id="pushModalCancel">Cancel</button>
+        <button class="btn btn-primary" id="pushModalSend">
+            <i class='bx bx-send'></i> Send to All Subscribers
+        </button>
+    </div>
+</div>
+{% endblock %}

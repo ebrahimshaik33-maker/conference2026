@@ -1,0 +1,100 @@
+{% extends "admin/admin_base.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block admin_content %}
+<!-- Stats Row -->
+<div class="stats-row" id="statsRow">
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-primary"><i class='bx bxs-calendar-event'></i></div>
+        <div class="stat-info">
+            <span class="stat-value" id="statTotalSessions">—</span>
+            <span class="stat-label">Total Sessions</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-success"><i class='bx bxs-calendar-check'></i></div>
+        <div class="stat-info">
+            <span class="stat-value" id="statSessionsToday">—</span>
+            <span class="stat-label">Most Active Day</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-danger"><i class='bx bxs-calendar-x'></i></div>
+        <div class="stat-info">
+            <span class="stat-value" id="statCancelled">—</span>
+            <span class="stat-label">Cancelled</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-info"><i class='bx bxs-user-voice'></i></div>
+        <div class="stat-info">
+            <span class="stat-value" id="statPresenters">—</span>
+            <span class="stat-label">Presenters</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="dashboard-section">
+    <h3 class="section-title">Quick Actions</h3>
+    <div class="quick-actions">
+        <a href="{{ url_for('pages.admin_sessions') }}?action=add" class="quick-action-btn">
+            <i class='bx bx-plus-circle'></i>
+            <span>Add Session</span>
+        </a>
+        <a href="{{ url_for('pages.admin_import_export') }}" class="quick-action-btn">
+            <i class='bx bx-upload'></i>
+            <span>Upload CSV</span>
+        </a>
+        <a href="/api/sessions/export/csv" class="quick-action-btn" id="dashExportCsv">
+            <i class='bx bx-download'></i>
+            <span>Export CSV</span>
+        </a>
+        <a href="{{ url_for('pages.index') }}" class="quick-action-btn" target="_blank">
+            <i class='bx bx-link-external'></i>
+            <span>View Programme</span>
+        </a>
+    </div>
+</div>
+
+<!-- Announcement Control -->
+<div class="dashboard-section">
+    <h3 class="section-title">Announcement</h3>
+    <div class="announcement-control">
+        <div class="form-row">
+            <div class="form-group form-group-grow">
+                <label for="dashAnnouncement">Announcement Text</label>
+                <input type="text" id="dashAnnouncement" class="form-input" placeholder="e.g., Lunch has moved to Hall B">
+            </div>
+            <div class="form-group">
+                <label for="dashAnnouncementType">Type</label>
+                <select id="dashAnnouncementType" class="form-select">
+                    <option value="info">ℹ️ Info</option>
+                    <option value="warning">⚠️ Warning</option>
+                    <option value="danger">🚨 Danger</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" id="saveAnnouncementBtn">
+                <i class='bx bx-save'></i> Save
+            </button>
+            <button class="btn btn-secondary" id="clearAnnouncementBtn">
+                <i class='bx bx-x'></i> Clear
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="dashboard-section">
+    <h3 class="section-title">Recent Activity</h3>
+    <div class="activity-feed" id="activityFeed">
+        <div class="empty-state">
+            <i class='bx bx-history'></i>
+            <p>No recent activity</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

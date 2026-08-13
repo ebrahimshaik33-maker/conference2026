@@ -1,0 +1,52 @@
+{% extends "admin/admin_base.html" %}
+
+{% block page_title %}Audit Log{% endblock %}
+
+{% block admin_content %}
+<div class="audit-log-section">
+    <div class="table-container">
+        <table class="data-table" id="auditTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody id="auditTableBody">
+                <!-- Populated by JS -->
+            </tbody>
+        </table>
+        <div class="table-empty-state" id="auditEmptyState" style="display:none;">
+            <i class='bx bx-history'></i>
+            <h4>No audit log entries</h4>
+            <p>Actions will be recorded here.</p>
+        </div>
+    </div>
+
+    <div class="pagination" id="auditPagination">
+        <button class="btn btn-secondary btn-sm" id="auditPrevBtn" disabled>
+            <i class='bx bx-chevron-left'></i> Previous
+        </button>
+        <span class="pagination-info" id="auditPageInfo">Page 1</span>
+        <button class="btn btn-secondary btn-sm" id="auditNextBtn" disabled>
+            Next <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</div>
+
+<!-- Audit Detail Modal -->
+<div class="slide-panel-backdrop" id="auditDetailBackdrop" style="display:none;"></div>
+<div class="slide-panel slide-panel-sm" id="auditDetailPanel" role="dialog" aria-modal="true" aria-labelledby="auditDetailTitle" style="display:none;">
+    <div class="slide-panel-header">
+        <h3 id="auditDetailTitle">Audit Detail</h3>
+        <button class="btn btn-icon" id="auditDetailClose" aria-label="Close">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+    <div class="slide-panel-body">
+        <pre class="audit-detail-json" id="auditDetailJson"></pre>
+    </div>
+</div>
+{% endblock %}

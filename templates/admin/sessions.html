@@ -1,0 +1,244 @@
+{% extends "admin/admin_base.html" %}
+
+{% block page_title %}Sessions{% endblock %}
+
+{% block mobile_actions %}
+<button class="btn btn-primary btn-sm" id="addSessionBtnMobile" aria-label="Add session">
+    <i class='bx bx-plus'></i>
+</button>
+{% endblock %}
+
+{% block admin_content %}
+<!-- Session Toolbar -->
+<div class="session-toolbar">
+    <div class="toolbar-left">
+        <h3 class="section-title">
+            Sessions
+            <span class="session-count" id="sessionCount"></span>
+        </h3>
+    </div>
+    <div class="toolbar-right">
+        <button class="btn btn-primary" id="addSessionBtn">
+            <i class='bx bx-plus'></i>
+            <span>Add Session</span>
+        </button>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="table-filter-bar">
+    <div class="filter-group">
+        <select class="form-select form-select-sm" id="filterDay" aria-label="Filter by day">
+            <option value="all">All Days</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <select class="form-select form-select-sm" id="filterType" aria-label="Filter by type">
+            <option value="all">All Types</option>
+            <option value="keynote">Keynote</option>
+            <option value="session">Session</option>
+            <option value="break">Break</option>
+            <option value="panel">Panel</option>
+            <option value="workshop">Workshop</option>
+            <option value="general">General</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <select class="form-select form-select-sm" id="filterStatus" aria-label="Filter by status">
+            <option value="all">All Statuses</option>
+            <option value="">Active</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="delayed">Delayed</option>
+            <option value="moved">Moved</option>
+        </select>
+    </div>
+    <div class="filter-group filter-group-grow">
+        <div class="search-input-wrapper">
+            <i class='bx bx-search search-icon'></i>
+            <input type="search" class="form-input form-input-sm" id="tableSearch" placeholder="Search by title or presenter...">
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Actions -->
+<div class="bulk-actions" id="bulkActions" style="display:none;">
+    <span class="bulk-count"><span id="selectedCount">0</span> selected</span>
+    <button class="btn btn-danger btn-sm" id="bulkDeleteBtn">
+        <i class='bx bx-trash'></i> Delete Selected
+    </button>
+    <button class="btn btn-secondary btn-sm" id="bulkStatusBtn">
+        <i class='bx bx-edit'></i> Change Status
+    </button>
+    <select class="form-select form-select-sm" id="bulkStatusSelect" style="display:none;">
+        <option value="">Active</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="delayed">Delayed</option>
+        <option value="moved">Moved</option>
+    </select>
+</div>
+
+<!-- Sessions Table -->
+<div class="table-container">
+    <table class="data-table" id="sessionsTable">
+        <thead>
+            <tr>
+                <th class="th-check"><input type="checkbox" id="selectAll" aria-label="Select all sessions"></th>
+                <th class="th-sortable" data-sort="day">Day</th>
+                <th class="th-sortable" data-sort="start_time">Time</th>
+                <th class="th-sortable" data-sort="title">Title</th>
+                <th class="th-sortable" data-sort="presenter">Presenter</th>
+                <th>Location</th>
+                <th>Track</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th class="th-actions">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="sessionsTableBody">
+            <!-- Populated by JS -->
+        </tbody>
+    </table>
+    <div class="table-empty-state" id="tableEmptyState" style="display:none;">
+        <i class='bx bx-calendar-event'></i>
+        <h4>No sessions found</h4>
+        <p>Add your first session or upload a CSV file.</p>
+        <button class="btn btn-primary" id="emptyAddSessionBtn">
+            <i class='bx bx-plus'></i> Add Session
+        </button>
+    </div>
+</div>
+
+<!-- Session Slide-in Panel Modal -->
+<div class="slide-panel-backdrop" id="sessionPanelBackdrop" style="display:none;"></div>
+<div class="slide-panel" id="sessionPanel" role="dialog" aria-modal="true" aria-labelledby="sessionPanelTitle" style="display:none;">
+    <div class="slide-panel-header">
+        <h3 id="sessionPanelTitle">Add Session</h3>
+        <button class="btn btn-icon" id="sessionPanelClose" aria-label="Close panel">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+    <div class="slide-panel-body">
+        <form id="sessionForm" class="session-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sessionDay">Day <span class="required">*</span></label>
+                    <input type="number" id="sessionDay" class="form-input" min="1" required placeholder="1">
+                    <span class="form-helper">Conference day number</span>
+                    <span class="form-error" id="sessionDayError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="sessionType">Type <span class="required">*</span></label>
+                    <select id="sessionType" class="form-select" required>
+                        <option value="session">📄 Session</option>
+                        <option value="keynote">🎤 Keynote</option>
+                        <option value="break">☕ Break</option>
+                        <option value="panel">💬 Panel</option>
+                        <option value="workshop">🔧 Workshop</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sessionStartTime">Start Time <span class="required">*</span></label>
+                    <input type="time" id="sessionStartTime" class="form-input" required>
+                    <span class="form-error" id="sessionStartTimeError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="sessionEndTime">End Time</label>
+                    <input type="time" id="sessionEndTime" class="form-input">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sessionTitle">Title <span class="required">*</span></label>
+                <input type="text" id="sessionTitle" class="form-input" required placeholder="Session title">
+                <span class="form-error" id="sessionTitleError"></span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sessionPresenter">Presenter</label>
+                    <input type="text" id="sessionPresenter" class="form-input" placeholder="Speaker name">
+                </div>
+                <div class="form-group">
+                    <label for="sessionAffiliation">Affiliation</label>
+                    <input type="text" id="sessionAffiliation" class="form-input" placeholder="e.g., University of Cape Town">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sessionBio">Short Bio</label>
+                <textarea id="sessionBio" class="form-textarea" rows="3" placeholder="Brief presenter biography"></textarea>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sessionLocation">Location</label>
+                    <input type="text" id="sessionLocation" class="form-input" list="locationSuggestions" placeholder="Room or venue">
+                    <datalist id="locationSuggestions"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="sessionTrack">Track</label>
+                    <input type="text" id="sessionTrack" class="form-input" list="trackSuggestions" placeholder="Session track">
+                    <datalist id="trackSuggestions"></datalist>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sessionDescription">Abstract / Description</label>
+                <textarea id="sessionDescription" class="form-textarea" rows="6" placeholder="Session abstract or description"></textarea>
+                <span class="form-helper char-count"><span id="descCharCount">0</span> characters</span>
+            </div>
+
+            <div class="form-group" id="menuDetailsGroup" style="display:none;">
+                <label for="sessionMenuDetails">Menu Details</label>
+                <textarea id="sessionMenuDetails" class="form-textarea" rows="3" placeholder="Catering menu for this break"></textarea>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sessionPaperUrl">Paper URL</label>
+                    <input type="url" id="sessionPaperUrl" class="form-input" placeholder="https://...">
+                    <span class="form-error" id="sessionPaperUrlError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="sessionEvalUrl">Evaluation URL</label>
+                    <input type="url" id="sessionEvalUrl" class="form-input" placeholder="https://...">
+                    <span class="form-error" id="sessionEvalUrlError"></span>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sessionStatus">Status</label>
+                    <select id="sessionStatus" class="form-select">
+                        <option value="">Active</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="delayed">Delayed</option>
+                        <option value="moved">Moved</option>
+                    </select>
+                </div>
+                <div class="form-group" id="movedToGroup" style="display:none;">
+                    <label for="sessionMovedTo">Moved To <span class="form-helper-inline">(optional)</span></label>
+                    <input type="text" id="sessionMovedTo" class="form-input" placeholder="e.g. Room 4B, Hall C, Online Stream">
+                    <span class="form-helper">Where did the session move? Shown to visitors on the programme.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sessionDisplayOrder">Display Order</label>
+                <input type="number" id="sessionDisplayOrder" class="form-input" value="0" placeholder="0">
+                <span class="form-helper">Order within the same time slot (lower = first)</span>
+            </div>
+
+            <input type="hidden" id="sessionId" value="">
+        </form>
+    </div>
+    <div class="slide-panel-footer">
+        <button class="btn btn-secondary" id="sessionCancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="sessionSaveBtn">
+            <i class='bx bx-save'></i>
+            <span>Save Session</span>
+        </button>
+    </div>
+</div>
+{% endblock %}

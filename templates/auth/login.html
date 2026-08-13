@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Login — {{ settings.event_title | default('LTRIE Conference') }}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class='bx bxs-graduation'></i>
+            </div>
+            <h1 class="auth-title">
+                {% if change_password is defined and change_password %}
+                    Change Password
+                {% else %}
+                    Admin Login
+                {% endif %}
+            </h1>
+            <p class="auth-subtitle">
+                {% if change_password is defined and change_password %}
+                    Please change your default password to continue
+                {% else %}
+                    {{ settings.event_title | default('LTRIE Conference Programme') }}
+                {% endif %}
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="auth-messages">
+            {% for category, message in messages %}
+            <div class="auth-alert auth-alert-{{ category }}">
+                <i class='bx {{ "bx-error-circle" if category == "error" else "bx-info-circle" if category == "info" else "bx-check-circle" }}'></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if change_password is defined and change_password %}
+        <form method="POST" action="{{ url_for('auth.change_password') }}" class="auth-form" id="changePasswordForm">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="form-group">
+                <label for="current_password">Current Password</label>
+                <div class="input-wrapper">
+                    <i class='bx bx-lock-alt input-icon'></i>
+                    <input type="password" id="current_password" name="current_password" required placeholder="Enter current password" autocomplete="current-password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="new_password">New Password</label>
+                <div class="input-wrapper">
+                    <i class='bx bx-lock input-icon'></i>
+                    <input type="password" id="new_password" name="new_password" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm New Password</label>
+                <div class="input-wrapper">
+                    <i class='bx bx-lock input-icon'></i>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="6" placeholder="Repeat new password" autocomplete="new-password">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full auth-submit">
+                <span>Change Password</span>
+                <i class='bx bx-right-arrow-alt'></i>
+            </button>
+        </form>
+        {% else %}
+        <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form" id="loginForm">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <i class='bx bx-user input-icon'></i>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username" autocomplete="username" autofocus>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <i class='bx bx-lock-alt input-icon'></i>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full auth-submit">
+                <span>Sign In</span>
+                <i class='bx bx-right-arrow-alt'></i>
+            </button>
+        </form>
+        {% endif %}
+
+        <div class="auth-footer">
+            <a href="{{ url_for('pages.index') }}" class="auth-back-link">
+                <i class='bx bx-arrow-back'></i>
+                <span>Back to Programme</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

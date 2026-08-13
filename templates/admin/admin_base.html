@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — {{ settings.event_title | default('Conference') }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Sidebar (Desktop) -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class='bx bxs-graduation'></i>
+            </div>
+            <span class="sidebar-title">Admin</span>
+            <button class="btn btn-icon sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('pages.admin_dashboard') }}" class="sidebar-link {% if request.endpoint == 'pages.admin_dashboard' %}active{% endif %}" id="nav-dashboard">
+                <i class='bx bxs-dashboard'></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('pages.admin_sessions') }}" class="sidebar-link {% if request.endpoint == 'pages.admin_sessions' %}active{% endif %}" id="nav-sessions">
+                <i class='bx bxs-calendar-event'></i>
+                <span>Sessions</span>
+            </a>
+            <a href="{{ url_for('pages.admin_settings') }}" class="sidebar-link {% if request.endpoint == 'pages.admin_settings' %}active{% endif %}" id="nav-settings">
+                <i class='bx bxs-cog'></i>
+                <span>Settings</span>
+            </a>
+            <a href="{{ url_for('pages.admin_import_export') }}" class="sidebar-link {% if request.endpoint == 'pages.admin_import_export' %}active{% endif %}" id="nav-import-export">
+                <i class='bx bxs-cloud-upload'></i>
+                <span>Import/Export</span>
+            </a>
+            <a href="{{ url_for('pages.admin_audit_log') }}" class="sidebar-link {% if request.endpoint == 'pages.admin_audit_log' %}active{% endif %}" id="nav-audit-log">
+                <i class='bx bxs-notepad'></i>
+                <span>Audit Log</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('pages.index') }}" class="sidebar-link" id="nav-programme">
+                <i class='bx bx-arrow-back'></i>
+                <span>Programme</span>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="sidebar-link sidebar-link-danger" id="nav-logout">
+                <i class='bx bx-log-out'></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="admin-bottom-nav" id="adminBottomNav" aria-label="Admin mobile navigation">
+        <a href="{{ url_for('pages.admin_dashboard') }}" class="bottom-nav-link {% if request.endpoint == 'pages.admin_dashboard' %}active{% endif %}">
+            <i class='bx bxs-dashboard'></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('pages.admin_sessions') }}" class="bottom-nav-link {% if request.endpoint == 'pages.admin_sessions' %}active{% endif %}">
+            <i class='bx bxs-calendar-event'></i>
+            <span>Sessions</span>
+        </a>
+        <a href="{{ url_for('pages.admin_settings') }}" class="bottom-nav-link {% if request.endpoint == 'pages.admin_settings' %}active{% endif %}">
+            <i class='bx bxs-cog'></i>
+            <span>Settings</span>
+        </a>
+        <a href="{{ url_for('pages.admin_import_export') }}" class="bottom-nav-link {% if request.endpoint == 'pages.admin_import_export' %}active{% endif %}">
+            <i class='bx bxs-cloud-upload'></i>
+            <span>Import</span>
+        </a>
+        <a href="{{ url_for('pages.admin_audit_log') }}" class="bottom-nav-link {% if request.endpoint == 'pages.admin_audit_log' %}active{% endif %}">
+            <i class='bx bxs-notepad'></i>
+            <span>Audit</span>
+        </a>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="admin-main" id="admin-main-content">
+        <!-- Mobile Header -->
+        <div class="admin-mobile-header">
+            <button class="btn btn-icon" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class='bx bx-menu'></i>
+            </button>
+            <h2 class="admin-page-title">{% block page_title %}Admin{% endblock %}</h2>
+            <div class="admin-mobile-actions">
+                {% block mobile_actions %}{% endblock %}
+            </div>
+        </div>
+
+        <div class="admin-content">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<!-- Admin Toast Container -->
+<div id="admin-toast-container" class="toast-container" role="alert" aria-live="polite"></div>
+
+<!-- Admin Confirmation Modal -->
+<div class="modal-backdrop" id="adminConfirmBackdrop" style="display:none;"></div>
+<div class="admin-confirm-modal" id="adminConfirmModal" role="dialog" aria-modal="true" aria-labelledby="adminConfirmTitle" style="display:none;">
+    <div class="admin-modal-header">
+        <h3 id="adminConfirmTitle"></h3>
+        <button class="btn btn-icon" id="adminConfirmClose" aria-label="Close dialog">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+    <div class="admin-modal-body" id="adminConfirmBody"></div>
+    <div class="admin-modal-footer">
+        <button class="btn btn-secondary" id="adminConfirmCancel">Cancel</button>
+        <button class="btn btn-danger" id="adminConfirmAction"></button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.CSRF_TOKEN = '{{ csrf_token }}';
+</script>
+<script defer src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

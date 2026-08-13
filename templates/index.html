@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}{{ settings.event_title | default('Conference Programme') }}{% endblock %}
+{% block description %}{{ settings.event_description | default('The official digital programme') }}{% endblock %}
+
+{% block content %}
+<header class="site-header" id="site-header">
+    <div class="header-inner">
+        <div class="header-logo">
+            {% if settings.logo_path %}
+            <img src="{{ url_for('static', filename='uploads/' + settings.logo_path) }}" alt="{{ settings.event_title }} logo" loading="eager" fetchpriority="high" class="logo-img">
+            {% else %}
+            <div class="logo-placeholder">
+                <i class='bx bxs-graduation'></i>
+            </div>
+            {% endif %}
+        </div>
+        <div class="header-title">
+            <h1 class="event-title">{{ settings.event_title | default('Conference Programme') }}</h1>
+            {% if settings.event_subtitle %}
+            <p class="event-subtitle">{{ settings.event_subtitle }}</p>
+            {% endif %}
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-icon theme-toggle-btn" id="printScheduleBtn" aria-label="Print schedule" style="display:none;">
+                <i class='bx bx-printer'></i>
+            </button>
+        </div>
+    </div>
+    {% if settings.banner_path and settings.show_top_banner != 'false' %}
+    <div class="header-banner-wrap">
+        <div class="container">
+            <img src="{{ url_for('static', filename='uploads/' + settings.banner_path) }}" alt="Event Banner" class="header-hero-banner" loading="eager">
+        </div>
+    </div>
+    {% endif %}
+</header>
+
+<!-- Announcement Banner -->
+<div class="announcement-banner" id="announcementBanner" style="display:none;" role="alert">
+    <div class="announcement-inner">
+        <i class='bx announcement-icon'></i>
+        <span class="announcement-text"></span>
+        <button class="announcement-close" id="announcementClose" aria-label="Dismiss announcement">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+</div>
+
+<!-- Controls Bar -->
+<div class="controls-bar" id="controlsBar">
+    <div class="controls-inner">
+        <!-- Day Navigation Container -->
+        <div class="day-nav-container">
+            <!-- Mobile Quick Switcher (Visible on mobile viewports) -->
+            <div class="mobile-day-bar" id="mobileDayBar">
+                <button class="mobile-day-btn" id="mobilePrevDay" aria-label="Previous day">
+                    <i class='bx bx-chevron-left'></i>
+                </button>
+                <button class="mobile-day-select-btn" id="mobileDaySelectBtn" aria-expanded="false" aria-label="Select conference day">
+                    <i class='bx bx-calendar'></i>
+                    <span id="mobileDaySelectLabel">Day 1 of 4</span>
+                    <i class='bx bx-chevron-down dropdown-icon'></i>
+                </button>
+                <button class="mobile-day-btn" id="mobileNextDay" aria-label="Next day">
+                    <i class='bx bx-chevron-right'></i>
+                </button>
+                <div class="mobile-day-dropdown" id="mobileDayDropdown" hidden>
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Scrollable Day Nav Pills with Arrows -->
+            <div class="day-nav-wrapper" id="dayNavWrapper">
+                <button class="day-scroll-arrow arrow-prev" id="dayNavPrev" aria-label="Scroll left">
+                    <i class='bx bx-chevron-left'></i>
+                </button>
+                <nav class="day-nav" aria-label="Conference days" id="dayNav" role="tablist">
+                    <!-- Days populated by JS -->
+                </nav>
+                <button class="day-scroll-arrow arrow-next" id="dayNavNext" aria-label="Scroll right">
+                    <i class='bx bx-chevron-right'></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Desktop Filters -->
+        <div class="filters-desktop" id="filtersDesktop">
+            <div class="filter-group">
+                <select class="filter-select" id="venueFilter" aria-label="Filter by venue">
+                    <option value="all">All Venues</option>
+                </select>
+            </div>
+            <div class="filter-group" id="trackFilterGroup">
+                <select class="filter-select" id="trackFilter" aria-label="Filter by track">
+                    <option value="all">All Tracks</option>
+                </select>
+            </div>
+            <div class="filter-group search-group">
+                <div class="search-input-wrapper">
+                    <i class='bx bx-search search-icon'></i>
+                    <input type="search" class="search-input" id="searchInput" placeholder="Search sessions..." aria-label="Search sessions">
+                </div>
+            </div>
+            <button class="btn btn-bookmark-toggle" id="bookmarkToggle" aria-label="Show bookmarked sessions" aria-pressed="false">
+                <i class='bx bx-star'></i>
+                <span class="bookmark-label">Bookmarks</span>
+                <span class="bookmark-count" id="bookmarkCount" style="display:none;">0</span>
+            </button>
+        </div>
+
+        <!-- Mobile Filter Button -->
+        <button class="btn btn-filter-mobile" id="mobileFilterBtn" aria-label="Open filters">
+            <i class='bx bx-filter-alt'></i>
+            <span>Filter</span>
+        </button>
+    </div>
+</div>
+
+<!-- Mobile Filter Bottom Sheet -->
+<div class="filter-sheet-backdrop" id="filterSheetBackdrop"></div>
+<div class="filter-sheet" id="filterSheet" role="dialog" aria-modal="true" aria-labelledby="filterSheetTitle">
+    <div class="filter-sheet-header">
+        <h2 id="filterSheetTitle">Filters</h2>
+        <button class="btn btn-icon filter-sheet-close" id="filterSheetClose" aria-label="Close filters">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+    <div class="filter-sheet-body">
+        <div class="filter-field">
+            <label for="mobileVenueFilter">Venue</label>
+            <select class="filter-select" id="mobileVenueFilter">
+                <option value="all">All Venues</option>
+            </select>
+        </div>
+        <div class="filter-field" id="mobileTrackFilterGroup">
+            <label for="mobileTrackFilter">Track</label>
+            <select class="filter-select" id="mobileTrackFilter">
+                <option value="all">All Tracks</option>
+            </select>
+        </div>
+        <div class="filter-field">
+            <label for="mobileSearchInput">Search</label>
+            <div class="search-input-wrapper">
+                <i class='bx bx-search search-icon'></i>
+                <input type="search" class="search-input" id="mobileSearchInput" placeholder="Search sessions...">
+            </div>
+        </div>
+        <div class="filter-field">
+            <button class="btn btn-bookmark-toggle btn-full" id="mobileBookmarkToggle" aria-pressed="false">
+                <i class='bx bx-star'></i>
+                <span>Show Bookmarks Only</span>
+            </button>
+        </div>
+    </div>
+    <div class="filter-sheet-footer">
+        <button class="btn btn-secondary" id="clearFiltersBtn">Clear All</button>
+        <button class="btn btn-primary" id="applyFiltersBtn">Apply</button>
+    </div>
+</div>
+
+<!-- Print Header (only visible when printing) -->
+<div class="print-header" id="printHeader">
+    <h1 id="printTitle"></h1>
+    <p id="printDate"></p>
+</div>
+
+<!-- Main Content -->
+<main id="main-content" role="main" class="schedule-main">
+    <div class="schedule-container" id="scheduleContainer">
+        <!-- Loading skeleton shown first, then replaced by JS -->
+        <div class="loading-skeleton" id="loadingSkeleton">
+            <div class="skeleton-time-group">
+                <div class="skeleton-time-label"></div>
+                <div class="skeleton-cards">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="skeleton-time-group">
+                <div class="skeleton-time-label"></div>
+                <div class="skeleton-cards">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="skeleton-time-group">
+                <div class="skeleton-time-label"></div>
+                <div class="skeleton-cards">
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        {% if settings.banner_path and settings.show_footer_banner != 'false' %}
+        <div class="footer-banner-container">
+            <img src="{{ url_for('static', filename='uploads/' + settings.banner_path) }}" alt="Event banner" loading="lazy" class="footer-hero-banner">
+        </div>
+        {% endif %}
+        <p class="footer-text">
+            {% if settings.footer_text %}
+                {{ settings.footer_text | safe }}
+            {% else %}
+                &copy; {{ settings.event_title | default('Conference Programme') }} &middot; Digital Programme
+            {% endif %}
+        </p>
+    </div>
+</footer>
+
+<!-- Confirmation Modal -->
+<div class="modal-backdrop" id="confirmModalBackdrop" style="display:none;"></div>
+<div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle" style="display:none;">
+    <h3 id="confirmModalTitle"></h3>
+    <p id="confirmModalMessage"></p>
+    <div class="confirm-modal-actions">
+        <button class="btn btn-secondary" id="confirmModalCancel">Cancel</button>
+        <button class="btn btn-primary" id="confirmModalConfirm">Confirm</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/schedule.js') }}"></script>
+{% if settings.push_enabled == 'true' %}
+<script defer src="{{ url_for('static', filename='js/push.js') }}"></script>
+{% endif %}
+{% endblock %}

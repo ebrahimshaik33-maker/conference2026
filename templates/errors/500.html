@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}500 — Server Error{% endblock %}
+{% block content %}
+<div class="error-page">
+    <div class="error-card">
+        <div class="error-icon"><i class='bx bx-error-circle'></i></div>
+        <h1>500</h1>
+        <p>Something went wrong on our end. Please try again later.</p>
+        <a href="{{ url_for('pages.index') }}" class="btn btn-primary">
+            <i class='bx bx-arrow-back'></i> Back to Programme
+        </a>
+    </div>
+</div>
+{% endblock %}

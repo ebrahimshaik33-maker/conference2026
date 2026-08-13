@@ -1,0 +1,144 @@
+{% extends "admin/admin_base.html" %}
+
+{% block page_title %}Import / Export{% endblock %}
+
+{% block admin_content %}
+<div class="ie-grid">
+    <!-- Export Section -->
+    <div class="ie-card">
+        <div class="ie-card-header">
+            <i class='bx bx-download'></i>
+            <h3>Export</h3>
+        </div>
+        <div class="ie-card-body">
+            <p>Download your session data in various formats.</p>
+            <div class="ie-actions">
+                <a href="/api/sessions/export/csv" class="btn btn-primary" id="exportCsvBtn">
+                    <i class='bx bx-spreadsheet'></i> Export CSV
+                </a>
+                <a href="/api/admin/export-db-backup" class="btn btn-secondary" id="exportDbBtn">
+                    <i class='bx bx-data'></i> Download DB Backup
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Section -->
+    <div class="ie-card">
+        <div class="ie-card-header">
+            <i class='bx bx-upload'></i>
+            <h3>Import CSV</h3>
+        </div>
+        <div class="ie-card-body">
+            <div class="import-mode">
+                <label class="radio-option">
+                    <input type="radio" name="importMode" value="merge" checked>
+                    <div class="radio-content">
+                        <strong>Merge / Update</strong>
+                        <p>Update existing sessions by ID and insert new ones. Nothing is deleted.</p>
+                    </div>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="importMode" value="replace">
+                    <div class="radio-content">
+                        <strong>Replace All</strong>
+                        <p class="text-danger">Delete ALL existing sessions and insert from CSV.</p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Replace Confirmation -->
+            <div class="replace-confirm" id="replaceConfirm" style="display:none;">
+                <div class="danger-box">
+                    <i class='bx bx-error-triangle'></i>
+                    <p><strong>Warning:</strong> This will permanently delete all existing sessions before importing. Type <strong>REPLACE</strong> to confirm.</p>
+                    <input type="text" id="replaceConfirmInput" class="form-input" placeholder='Type "REPLACE" to confirm'>
+                </div>
+            </div>
+
+            <!-- CSV Delimiter / Separator -->
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label for="csvDelimiterSelect" class="form-label" style="font-weight: 600; font-size: 0.88rem; margin-bottom: 6px; display: block;">
+                    <i class='bx bx-abacus'></i> CSV Separator
+                </label>
+                <select id="csvDelimiterSelect" class="form-select" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md, 8px); border: 1px solid var(--color-border, #cbd5e1); background: var(--input-bg, var(--color-surface, #ffffff)); color: var(--color-text, #0f172a);">
+                    <option value=",">Comma ( , ) — Default</option>
+                    <option value=";">Semicolon ( ; ) — Excel / European</option>
+                    <option value="\t">Tab ( \t ) — TSV</option>
+                    <option value=":">Colon ( : )</option>
+                    <option value="auto">Auto-Detect Separator</option>
+                </select>
+            </div>
+
+            <div class="file-upload-zone" id="csvUploadZone">
+                <i class='bx bx-cloud-upload'></i>
+                <p>Drop CSV file here or click to browse</p>
+                <input type="file" id="csvFileInput" accept=".csv" class="file-input">
+                <span class="file-name" id="csvFileName"></span>
+            </div>
+
+            <button class="btn btn-primary btn-full" id="uploadCsvBtn" disabled>
+                <i class='bx bx-upload'></i> Upload CSV
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Import Report -->
+<div class="import-report" id="importReport" style="display:none;">
+    <div class="ie-card">
+        <div class="ie-card-header">
+            <i class='bx bx-check-circle'></i>
+            <h3>Import Report</h3>
+        </div>
+        <div class="ie-card-body">
+            <div class="report-stats">
+                <div class="report-stat report-stat-success">
+                    <span class="report-stat-value" id="reportInserted">0</span>
+                    <span class="report-stat-label">Inserted</span>
+                </div>
+                <div class="report-stat report-stat-info">
+                    <span class="report-stat-value" id="reportUpdated">0</span>
+                    <span class="report-stat-label">Updated</span>
+                </div>
+                <div class="report-stat report-stat-warning">
+                    <span class="report-stat-value" id="reportSkipped">0</span>
+                    <span class="report-stat-label">Skipped</span>
+                </div>
+            </div>
+            <div class="skipped-rows" id="skippedRows" style="display:none;">
+                <h4>Skipped Rows</h4>
+                <table class="data-table data-table-sm">
+                    <thead>
+                        <tr><th>Row</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody id="skippedRowsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Danger Zone -->
+<div class="danger-zone">
+    <h3 class="danger-zone-title"><i class='bx bx-error-triangle'></i> Danger Zone</h3>
+    <div class="danger-zone-content">
+        <div class="danger-zone-item">
+            <div>
+                <strong>Delete All Sessions</strong>
+                <p>Permanently delete every session in the database. This cannot be undone.</p>
+            </div>
+            <button class="btn btn-danger" id="wipeAllBtn">
+                <i class='bx bx-trash'></i> Delete All
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Wipe Confirmation Modal content (used by admin.js) -->
+<div id="wipeConfirmContent" style="display:none;">
+    <p>This will <strong>permanently delete ALL sessions</strong>. This action cannot be undone.</p>
+    <p>Type <strong>DELETE ALL</strong> to confirm:</p>
+    <input type="text" id="wipeConfirmInput" class="form-input" placeholder='Type "DELETE ALL"'>
+</div>
+{% endblock %}
