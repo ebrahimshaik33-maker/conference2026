@@ -35,6 +35,11 @@ def _normalize_time(t):
     return None
 
 
+def _is_valid_time(t):
+    """Check if time string is valid HH:MM format."""
+    return _normalize_time(t) is not None
+
+
 def _normalize_url(url):
     """Normalize URL strings to include http:// or https:// if missing."""
     if not url or not str(url).strip():
@@ -441,10 +446,14 @@ def upload_csv():
             skipped_rows.append({'row': row_num, 'reason': f'Invalid day value: {day}'})
             continue
 
-        if not _is_valid_time(start_time):
+        norm_start = _normalize_time(start_time)
+        if not norm_start:
             skipped += 1
             skipped_rows.append({'row': row_num, 'reason': f'Invalid start_time: {start_time}'})
             continue
+
+        raw_end = row.get('end_time', '')
+        norm_end = _normalize_time(raw_end) if raw_end else None
 
         # Validate type
         session_type = row.get('type', 'session')
@@ -465,8 +474,8 @@ def upload_csv():
         # Build session data
         session_data = {
             'day': day_int,
-            'start_time': start_time,
-            'end_time': row.get('end_time', '') or None,
+            'start_time': norm_start,
+            'end_time': norm_end,
             'title': title,
             'presenter': row.get('presenter', ''),
             'affiliation': row.get('affiliation', ''),
