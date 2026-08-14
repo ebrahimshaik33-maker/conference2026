@@ -48,6 +48,12 @@ def index():
     return render_template('index.html', settings=settings)
 
 
+@pages_bp.route('/landing')
+@pages_bp.route('/conference-corner')
+def landing():
+    return render_template('landing.html')
+
+
 @pages_bp.route('/admin')
 @login_required
 @password_change_required
