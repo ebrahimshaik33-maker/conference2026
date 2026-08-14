@@ -853,8 +853,38 @@ h1, h2, h3, h4, h5, h6 {
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    gap: 12px;
     margin-bottom: var(--space-3);
+    width: 100%;
+}
+
+.card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.card-time-pill {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.08);
+    border: 1px solid var(--color-border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
 }
 
 .type-badge {
@@ -2479,7 +2509,7 @@ body.style-neon .type-badge {
    ═══════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════
-   LAYOUT 2: REDESIGNED COMPACT LIST DESIGN
+   LAYOUT 2: CLEAN, PREMIUM COMPACT LIST DESIGN
    ═══════════════════════════════════════════════════════════════ */
 body.layout-compact {
     overflow-x: hidden;
@@ -2531,26 +2561,19 @@ body.layout-compact .time-slot-cards {
     width: 100%;
 }
 
-/* ─── Compact Session Card: 3-Column Structured Layout ─── */
+/* ─── Compact Session Card: Clean Flex Column ─── */
 body.layout-compact .session-card {
     width: 100%;
     box-sizing: border-box;
-    padding: 16px 20px;
+    padding: 16px 22px;
     background: var(--card-bg, rgba(255, 255, 255, 0.04));
     border: 1px solid var(--card-border);
     border-left: 5px solid var(--color-primary);
     border-radius: var(--radius-lg, 12px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    display: grid;
-    grid-template-columns: 140px 1fr auto;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-        "timecol  maininfo  actions"
-        "timecol  maininfo  links"
-        "expand   expand    expand";
-    align-items: center;
-    column-gap: 24px;
-    row-gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     min-height: unset;
     transition: all 0.2s ease;
 }
@@ -2562,63 +2585,76 @@ body.layout-compact .session-card:hover {
     background: var(--card-bg-hover, rgba(255, 255, 255, 0.07));
 }
 
-/* Col 1: Time & Type Badge Column */
+/* Header: Left (Badge + Time) vs Right (Actions + Bookmark) */
 body.layout-compact .session-card .card-header {
-    grid-area: timecol;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    margin-bottom: 0;
-    width: 100%;
-}
-
-body.layout-compact .session-card .card-header .type-badge {
-    font-size: 0.72rem;
-    padding: 3px 8px;
-    font-weight: 700;
-    border-radius: 4px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-body.layout-compact .session-card .card-time {
-    grid-area: timecol;
-    margin-top: 28px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 2px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-/* Col 2: Main Session Info */
+body.layout-compact .card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+body.layout-compact .card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+body.layout-compact .card-time-pill {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.08);
+    border: 1px solid var(--color-border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+/* Title */
 body.layout-compact .session-card .card-title {
-    grid-area: maininfo;
-    font-size: 1.08rem;
+    font-size: 1.12rem;
     font-weight: 700;
     line-height: 1.35;
     color: var(--color-text);
-    margin: 0 0 4px 0;
+    margin: 2px 0 4px 0;
+    cursor: pointer;
+    transition: color 0.15s ease;
 }
 
+body.layout-compact .session-card .card-title:hover {
+    color: var(--color-primary);
+}
+
+/* Meta: Speaker, Location, Track */
 body.layout-compact .session-card .card-meta {
-    grid-area: maininfo;
-    margin-top: 26px;
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 18px;
-    font-size: 0.84rem;
+    gap: 14px 20px;
+    font-size: 0.85rem;
     color: var(--color-text-secondary);
+    margin-bottom: 0;
 }
 
 body.layout-compact .session-card .card-meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 body.layout-compact .session-card .card-meta-item i {
@@ -2626,19 +2662,16 @@ body.layout-compact .session-card .card-meta-item i {
     font-size: 0.95rem;
 }
 
-/* Col 3: Action Buttons & Links */
+/* Actions & Links */
 body.layout-compact .session-card .card-actions {
-    grid-area: actions;
-    margin-top: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 8px;
-    flex-wrap: nowrap;
+    margin-top: 0;
 }
 
 body.layout-compact .session-card .card-expand-btn {
-    padding: 6px 12px;
+    padding: 5px 12px;
     font-size: 0.8rem;
     font-weight: 600;
     border-radius: 6px;
@@ -2659,12 +2692,9 @@ body.layout-compact .session-card .card-expand-btn:hover {
     border-color: var(--color-primary);
 }
 
-body.layout-compact .session-card .card-header .bookmark-btn {
-    position: absolute;
-    top: 14px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
+body.layout-compact .session-card .bookmark-btn {
+    width: 34px;
+    height: 34px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2674,29 +2704,27 @@ body.layout-compact .session-card .card-header .bookmark-btn {
     transition: color 0.15s ease, transform 0.15s ease;
 }
 
-body.layout-compact .session-card .card-header .bookmark-btn:hover {
+body.layout-compact .session-card .bookmark-btn:hover {
     color: #eab308;
     transform: scale(1.1);
 }
 
-body.layout-compact .session-card .card-header .bookmark-btn.bookmarked {
+body.layout-compact .session-card .bookmark-btn.bookmarked {
     color: #eab308;
 }
 
 body.layout-compact .session-card .card-links {
-    grid-area: links;
-    margin-top: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 8px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    margin-top: 4px;
 }
 
 body.layout-compact .session-card .card-link {
     font-size: 0.78rem;
     font-weight: 600;
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 6px;
     background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.08);
     color: var(--color-primary);
@@ -2715,10 +2743,8 @@ body.layout-compact .session-card .card-link:hover {
 
 /* Expandable Drawer (Abstract & Bio) */
 body.layout-compact .session-card .card-expandable {
-    grid-area: expand;
-    grid-column: 1 / -1;
     width: 100%;
-    margin-top: 12px;
+    margin-top: 8px;
     padding: 16px 20px;
     background: rgba(0, 0, 0, 0.02);
     border: 1px solid var(--color-border);
@@ -2741,68 +2767,57 @@ body.layout-compact .session-card .card-expandable .card-description {
     }
     
     body.layout-compact .session-card {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
         padding: 14px 16px;
+        gap: 10px;
         width: 100% !important;
-        box-sizing: border-box !important;
     }
 
     body.layout-compact .session-card .card-header {
-        width: 100%;
-        display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        gap: 8px;
     }
 
-    body.layout-compact .session-card .card-header .bookmark-btn {
-        position: static;
-    }
-
-    body.layout-compact .session-card .card-time {
-        margin-top: 0;
-        font-size: 0.8rem;
+    body.layout-compact .card-header-left {
+        gap: 6px;
     }
 
     body.layout-compact .session-card .card-title {
         font-size: 1rem;
         line-height: 1.35;
         width: 100%;
+        margin: 0;
     }
 
     body.layout-compact .session-card .card-meta {
-        margin-top: 0;
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
         width: 100%;
     }
 
+    body.layout-compact .card-header-right {
+        gap: 6px;
+    }
+
     body.layout-compact .session-card .card-actions {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 8px;
-        padding-top: 6px;
-        border-top: 1px dashed var(--color-border);
+        gap: 6px;
     }
 
     body.layout-compact .session-card .card-links {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 8px;
+        gap: 6px;
     }
 
     body.layout-compact .session-card .card-expandable {
         width: 100%;
         padding: 12px 14px;
-        margin-top: 6px;
     }
 }
 

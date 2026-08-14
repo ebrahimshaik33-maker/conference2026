@@ -670,33 +670,49 @@
     const isBookmarked = state.bookmarks.some((b) => b.id === session.id);
     const showEval = state.settings.show_evaluation_links !== 'false';
 
+    let timeStr = session.start_time || '';
+    if (session.end_time) timeStr += ' – ' + session.end_time;
+
     let html = '';
 
-    // Header: type badge + bookmark
+    // Header: Left (Type Badge + Time), Right (Action buttons + Bookmark)
     html += '<div class="card-header">';
+    html += '  <div class="card-header-left">';
     if (tc.label) {
-      html += '<span class="type-badge type-badge-' + session.type + '">' +
+      html += '    <span class="type-badge type-badge-' + session.type + '">' +
               (tc.icon ? tc.icon + ' ' : '') + tc.label + '</span>';
-    } else {
-      html += '<span></span>';
     }
-    html += '<button class="bookmark-btn' + (isBookmarked ? ' bookmarked' : '') + '" ' +
+    if (timeStr) {
+      html += '    <span class="card-time-pill"><i class="bx bx-time-five"></i> ' + timeStr + '</span>';
+    }
+    html += '  </div>';
+
+    html += '  <div class="card-header-right">';
+    html += '    <div class="card-actions">';
+    if (session.description) {
+      html += '<button class="card-expand-btn" aria-expanded="false" data-target="desc-' + session.id + '" aria-label="Show abstract">' +
+              'Abstract <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
+    }
+    if (session.bio) {
+      html += '<button class="card-expand-btn" aria-expanded="false" data-target="bio-' + session.id + '" aria-label="Show speaker biography">' +
+              'Bio <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
+    }
+    if (session.menu_details) {
+      html += '<button class="card-expand-btn" aria-expanded="false" data-target="menu-' + session.id + '" aria-label="Show menu">' +
+              'Menu <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
+    }
+    html += '    </div>';
+    html += '    <button class="bookmark-btn' + (isBookmarked ? ' bookmarked' : '') + '" ' +
             'aria-label="' + (isBookmarked ? 'Remove bookmark' : 'Bookmark session') + '" ' +
             'data-id="' + session.id + '">' +
             '<i class="bx ' + (isBookmarked ? 'bxs-star' : 'bx-star') + '"></i></button>';
+    html += '  </div>';
     html += '</div>';
 
     // Title
-    html += '<h3 class="card-title">' + escapeHtml(session.title) + '</h3>';
+    html += '<h3 class="card-title" title="Click to view full details">' + escapeHtml(session.title) + '</h3>';
 
-    // Time
-    if (session.start_time) {
-      let timeStr = session.start_time;
-      if (session.end_time) timeStr += ' – ' + session.end_time;
-      html += '<div class="card-time"><i class="bx bx-time-five"></i> ' + timeStr + '</div>';
-    }
-
-    // Meta
+    // Meta (Speaker, Location, Track)
     html += '<div class="card-meta">';
     if (session.presenter) {
       let presenterText = escapeHtml(session.presenter);
@@ -711,36 +727,7 @@
     }
     html += '</div>';
 
-    // Expandable sections
-    html += '<div class="card-actions">';
-    if (session.description) {
-      html += '<button class="card-expand-btn" aria-expanded="false" data-target="desc-' + session.id + '" aria-label="Show abstract">' +
-              'Abstract <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
-    }
-    if (session.bio) {
-      html += '<button class="card-expand-btn" aria-expanded="false" data-target="bio-' + session.id + '" aria-label="Show speaker biography">' +
-              'Bio <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
-    }
-    if (session.menu_details) {
-      html += '<button class="card-expand-btn" aria-expanded="false" data-target="menu-' + session.id + '" aria-label="Show menu">' +
-              'Menu <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
-    }
-    html += '</div>';
-
-    if (session.description) {
-      html += '<div class="card-expandable" id="desc-' + session.id + '">' +
-              '<div class="card-description">' + escapeHtml(session.description) + '</div></div>';
-    }
-    if (session.bio) {
-      html += '<div class="card-expandable" id="bio-' + session.id + '">' +
-              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-id-card"></i> Presenter Biography:</strong>' + escapeHtml(session.bio) + '</div></div>';
-    }
-    if (session.menu_details) {
-      html += '<div class="card-expandable" id="menu-' + session.id + '">' +
-              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-restaurant"></i> Catering Menu:</strong>' + escapeHtml(session.menu_details) + '</div></div>';
-    }
-
-    // Links
+    // Links (Paper, Evaluate)
     if (session.paper_url || (session.evaluation_url && showEval)) {
       html += '<div class="card-links">';
       if (session.paper_url) {
@@ -752,6 +739,20 @@
                 '<i class="bx bx-edit"></i> Evaluate</a>';
       }
       html += '</div>';
+    }
+
+    // Expandable sections (Abstract, Bio, Menu)
+    if (session.description) {
+      html += '<div class="card-expandable" id="desc-' + session.id + '">' +
+              '<div class="card-description">' + escapeHtml(session.description) + '</div></div>';
+    }
+    if (session.bio) {
+      html += '<div class="card-expandable" id="bio-' + session.id + '">' +
+              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-id-card"></i> Presenter Biography:</strong>' + escapeHtml(session.bio) + '</div></div>';
+    }
+    if (session.menu_details) {
+      html += '<div class="card-expandable" id="menu-' + session.id + '">' +
+              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-restaurant"></i> Catering Menu:</strong>' + escapeHtml(session.menu_details) + '</div></div>';
     }
 
     // Status
