@@ -65,7 +65,7 @@
       state.lastDataHash = newHash;
 
       // Apply theme
-      document.body.className = state.settings.theme || 'theme-dut-dark';
+      document.body.className = state.settings.theme || 'theme-adv-dark';
 
       // Hide skeleton
       const skeleton = $('#loadingSkeleton');

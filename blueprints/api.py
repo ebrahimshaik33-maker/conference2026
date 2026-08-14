@@ -687,7 +687,7 @@ def get_audit_log():
 @api_bp.route('/admin/export-db-backup', methods=['GET'])
 @login_required
 def export_db_backup():
-    db_path = os.path.join(current_app.instance_path, 'ltrie.db')
+    db_path = os.path.join(current_app.instance_path, 'conference.db')
     if not os.path.exists(db_path):
         # Try relative path
         db_uri = current_app.config['SQLALCHEMY_DATABASE_URI']
@@ -702,7 +702,7 @@ def export_db_backup():
     _log_audit('EXPORT_DB_BACKUP', {})
     db.session.commit()
 
-    backup_name = f'ltrie_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db'
+    backup_name = f'conference_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db'
     return send_file(db_path, as_attachment=True, download_name=backup_name)
 
 

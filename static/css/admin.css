@@ -933,9 +933,9 @@
 .tp-card { flex: 1; margin: 4px; border-radius: 3px; }
 
 /* Preview swatches per theme */
-.theme-preview-dut-dark           { background: #0f1420; }
-.theme-preview-dut-dark .tp-bar   { background: #E8A838; }
-.theme-preview-dut-dark .tp-card  { background: rgba(255,255,255,0.08); }
+.theme-preview-dark-gold           { background: #0f1420; }
+.theme-preview-dark-gold .tp-bar   { background: #E8A838; }
+.theme-preview-dark-gold .tp-card  { background: rgba(255,255,255,0.08); }
 
 .theme-preview-corporate-blue           { background: #f4f6f9; }
 .theme-preview-corporate-blue .tp-bar   { background: #1a73e8; }
@@ -1354,14 +1354,14 @@
 }
 
 
-/* ─── DUT & University Theme Previews ─── */
-.theme-preview-adv-dut                 { background: #000000; }
-.theme-preview-adv-dut .tp-bar         { background: linear-gradient(to right, #c13830, #782d72); }
-.theme-preview-adv-dut .tp-card        { background: #0d0c10; border: 1px solid #747474; }
+/* ─── University & Advanced Theme Previews ─── */
+.theme-preview-adv-dark                 { background: #000000; }
+.theme-preview-adv-dark .tp-bar         { background: linear-gradient(to right, #c13830, #782d72); }
+.theme-preview-adv-dark .tp-card        { background: #0d0c10; border: 1px solid #747474; }
 
-.theme-preview-adv-dut-light           { background: #ffffff; }
-.theme-preview-adv-dut-light .tp-bar   { background: linear-gradient(to right, #c13830, #782d72); }
-.theme-preview-adv-dut-light .tp-card  { background: #ffffff; border: 1px solid #747474; }
+.theme-preview-adv-light           { background: #ffffff; }
+.theme-preview-adv-light .tp-bar   { background: linear-gradient(to right, #c13830, #782d72); }
+.theme-preview-adv-light .tp-card  { background: #ffffff; border: 1px solid #747474; }
 
 .theme-preview-adv-ukzn                { background: #08121e; }
 .theme-preview-adv-ukzn .tp-bar        { background: linear-gradient(to right, #cc0000, #003366); }

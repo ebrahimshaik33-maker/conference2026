@@ -70,7 +70,7 @@
     </style>
     {% endif %}
 </head>
-<body class="{{ settings.theme if settings is defined and settings.theme is defined else 'theme-dut-dark' }} style-{{ settings.ui_style if settings is defined and settings.ui_style is defined else 'glass' }} layout-{{ settings.layout if settings is defined and settings.layout is defined else 'timeline' }}">
+<body class="{{ settings.theme if settings is defined and settings.theme is defined else 'theme-adv-dark' }} style-{{ settings.ui_style if settings is defined and settings.ui_style is defined else 'glass' }} layout-{{ settings.layout if settings is defined and settings.layout is defined else 'timeline' }}">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     {% block content %}{% endblock %}
