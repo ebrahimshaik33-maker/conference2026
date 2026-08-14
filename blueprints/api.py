@@ -644,6 +644,23 @@ def reset_banner():
     return jsonify({'status': 'success', 'message': 'Banner reset to default'})
 
 
+@api_bp.route('/settings/reset-custom-bg', methods=['POST'])
+@login_required
+@validate_csrf
+def reset_custom_bg():
+    setting = db.session.get(Setting, 'custom_bg_path')
+    if setting and setting.value:
+        old_file = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'], setting.value)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+        setting.value = ''
+
+    _log_audit('RESET_CUSTOM_BG', {})
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'Background image reset to default'})
+
+
 # ─── Admin Utility API ────────────────────────────────────────
 
 @api_bp.route('/admin/stats', methods=['GET'])

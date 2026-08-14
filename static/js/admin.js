@@ -18,6 +18,7 @@
     WIPE_ALL: '/api/sessions/wipe-all',
     RESET_LOGO: '/api/settings/reset-logo',
     RESET_BANNER: '/api/settings/reset-banner',
+    RESET_CUSTOM_BG: '/api/settings/reset-custom-bg',
   };
 
   const $ = (sel) => document.querySelector(sel);
@@ -858,14 +859,12 @@
     }
     const resetCustomBg = $('#resetCustomBgBtn');
     if (resetCustomBg) {
-      resetCustomBg.addEventListener('click', async () => {
-        const res = await apiFetch('/api/settings/reset-custom-bg', { method: 'POST' });
+      resetCustomBg.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const res = await apiFetch(API.RESET_CUSTOM_BG, { method: 'POST' });
         if (res) {
           showToast('Background image removed', 'success');
-          const preview = $('#customBgPreview');
-          if (preview) preview.innerHTML = '<i class="bx bx-image-add"></i><span>Drop image or click to upload</span>';
-        } else {
-          // Soft reset if endpoint doesn't exist yet
           const preview = $('#customBgPreview');
           if (preview) preview.innerHTML = '<i class="bx bx-image-add"></i><span>Drop image or click to upload</span>';
           if (customBgInputEl) customBgInputEl.value = '';
