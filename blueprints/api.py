@@ -342,7 +342,7 @@ def export_csv():
 
     headers = [
         'id', 'day', 'start_time', 'end_time', 'title', 'presenter', 'affiliation',
-        'location', 'track', 'type', 'paper_url', 'evaluation_url', 'description',
+        'bio', 'location', 'track', 'type', 'paper_url', 'evaluation_url', 'description',
         'menu_details', 'status', 'moved_to', 'display_order'
     ]
     writer.writerow(headers)
@@ -350,7 +350,7 @@ def export_csv():
     for s in sessions:
         writer.writerow([
             s.id, s.day, s.start_time, s.end_time or '', s.title,
-            s.presenter or '', s.affiliation or '', s.location or '',
+            s.presenter or '', s.affiliation or '', s.bio or '', s.location or '',
             s.track or '', s.type, s.paper_url or '', s.evaluation_url or '',
             s.description or '', s.menu_details or '', s.status or '',
             s.moved_to or '', s.display_order
@@ -472,6 +472,7 @@ def upload_csv():
             disp_order = 0
 
         # Build session data
+        bio_val = row.get('bio', '') or row.get('short_bio', '') or row.get('speaker_bio', '') or row.get('presenter_bio', '')
         session_data = {
             'day': day_int,
             'start_time': norm_start,
@@ -479,6 +480,7 @@ def upload_csv():
             'title': title,
             'presenter': row.get('presenter', ''),
             'affiliation': row.get('affiliation', ''),
+            'bio': bio_val,
             'location': row.get('location', ''),
             'track': row.get('track', ''),
             'type': session_type,

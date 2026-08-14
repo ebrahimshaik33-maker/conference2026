@@ -717,6 +717,10 @@
       html += '<button class="card-expand-btn" aria-expanded="false" data-target="desc-' + session.id + '" aria-label="Show abstract">' +
               'Abstract <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
     }
+    if (session.bio) {
+      html += '<button class="card-expand-btn" aria-expanded="false" data-target="bio-' + session.id + '" aria-label="Show speaker biography">' +
+              'Bio <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
+    }
     if (session.menu_details) {
       html += '<button class="card-expand-btn" aria-expanded="false" data-target="menu-' + session.id + '" aria-label="Show menu">' +
               'Menu <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
@@ -727,9 +731,13 @@
       html += '<div class="card-expandable" id="desc-' + session.id + '">' +
               '<div class="card-description">' + escapeHtml(session.description) + '</div></div>';
     }
+    if (session.bio) {
+      html += '<div class="card-expandable" id="bio-' + session.id + '">' +
+              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-id-card"></i> Presenter Biography:</strong>' + escapeHtml(session.bio) + '</div></div>';
+    }
     if (session.menu_details) {
       html += '<div class="card-expandable" id="menu-' + session.id + '">' +
-              '<div class="card-description">' + escapeHtml(session.menu_details) + '</div></div>';
+              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-restaurant"></i> Catering Menu:</strong>' + escapeHtml(session.menu_details) + '</div></div>';
     }
 
     // Links

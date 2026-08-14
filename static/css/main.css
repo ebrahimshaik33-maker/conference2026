@@ -2482,33 +2482,76 @@ body.style-neon .type-badge {
 body.layout-compact .time-slot-cards {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 body.layout-compact .session-card {
-    padding: 12px 18px;
+    padding: 14px 20px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    justify-content: flex-start;
+    gap: 14px 18px;
     min-height: unset;
+    transition: background var(--duration-fast), border-color var(--duration-fast), box-shadow var(--duration-fast);
 }
 body.layout-compact .session-card .card-header {
     margin-bottom: 0;
     width: auto;
+    flex-shrink: 0;
 }
 body.layout-compact .session-card .card-title {
     font-size: var(--text-base);
+    font-weight: 700;
     margin-bottom: 0;
-    flex: 1;
+    flex: 1 1 260px;
+    line-height: 1.35;
 }
 body.layout-compact .session-card .card-time {
     margin-bottom: 0;
     white-space: nowrap;
+    font-size: var(--text-sm);
+    flex-shrink: 0;
 }
 body.layout-compact .session-card .card-meta {
     margin-top: 0;
-    white-space: nowrap;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+body.layout-compact .session-card .card-actions {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+body.layout-compact .session-card .card-expandable {
+    width: 100%;
+    flex-basis: 100%;
+    margin-top: 10px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+}
+body.layout-compact .session-card .card-expandable .card-description {
+    white-space: normal;
+    word-break: break-word;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+}
+body.layout-compact .session-card .card-links {
+    width: 100%;
+    flex-basis: 100%;
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
 }
 
 /* Layout 3: Track Grid */
