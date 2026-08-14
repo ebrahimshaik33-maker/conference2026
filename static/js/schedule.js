@@ -675,20 +675,46 @@
 
     let html = '';
 
-    // Header: Left (Type Badge + Time), Right (Action buttons + Bookmark)
-    html += '<div class="card-header">';
-    html += '  <div class="card-header-left">';
-    if (tc.label) {
-      html += '    <span class="type-badge type-badge-' + session.type + '">' +
-              (tc.icon ? tc.icon + ' ' : '') + tc.label + '</span>';
-    }
+    // Main Row containing 3 distinct columns: [Time & Venue] [Title & Speaker] [Actions & Links]
+    html += '<div class="session-main-row">';
+
+    // ── Column 1: Time & Location ──
+    html += '  <div class="session-col-time">';
     if (timeStr) {
-      html += '    <span class="card-time-pill"><i class="bx bx-time-five"></i> ' + timeStr + '</span>';
+      html += '    <div class="session-time-pill"><i class="bx bx-time-five"></i> ' + timeStr + '</div>';
+    }
+    if (session.location) {
+      html += '    <div class="session-venue-pill"><i class="bx bx-map"></i> ' + escapeHtml(session.location) + '</div>';
     }
     html += '  </div>';
 
-    html += '  <div class="card-header-right">';
-    html += '    <div class="card-actions">';
+    // ── Column 2: Badge, Title & Speaker ──
+    html += '  <div class="session-col-content">';
+    html += '    <div class="session-title-line">';
+    if (tc.label) {
+      html += '      <span class="type-badge type-badge-' + session.type + '">' +
+              (tc.icon ? tc.icon + ' ' : '') + tc.label + '</span>';
+    }
+    html += '      <h3 class="card-title" title="Click to view details">' + escapeHtml(session.title) + '</h3>';
+    html += '    </div>';
+
+    if (session.presenter || session.track) {
+      html += '    <div class="session-meta-line">';
+      if (session.presenter) {
+        let presenterText = escapeHtml(session.presenter);
+        if (session.affiliation) presenterText += ' — ' + escapeHtml(session.affiliation);
+        html += '      <span class="session-meta-speaker"><i class="bx bx-user"></i> ' + presenterText + '</span>';
+      }
+      if (session.track) {
+        html += '      <span class="session-meta-track"><i class="bx bx-purchase-tag"></i> ' + escapeHtml(session.track) + '</span>';
+      }
+      html += '    </div>';
+    }
+    html += '  </div>';
+
+    // ── Column 3: Action Buttons, Links & Bookmark ──
+    html += '  <div class="session-col-actions">';
+    html += '    <div class="session-btns-row">';
     if (session.description) {
       html += '<button class="card-expand-btn" aria-expanded="false" data-target="desc-' + session.id + '" aria-label="Show abstract">' +
               'Abstract <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
@@ -701,50 +727,32 @@
       html += '<button class="card-expand-btn" aria-expanded="false" data-target="menu-' + session.id + '" aria-label="Show menu">' +
               'Menu <span class="chevron"><i class="bx bx-chevron-down"></i></span></button>';
     }
-    html += '    </div>';
-    html += '    <button class="bookmark-btn' + (isBookmarked ? ' bookmarked' : '') + '" ' +
+    html += '      <button class="bookmark-btn' + (isBookmarked ? ' bookmarked' : '') + '" ' +
             'aria-label="' + (isBookmarked ? 'Remove bookmark' : 'Bookmark session') + '" ' +
             'data-id="' + session.id + '">' +
             '<i class="bx ' + (isBookmarked ? 'bxs-star' : 'bx-star') + '"></i></button>';
-    html += '  </div>';
-    html += '</div>';
+    html += '    </div>';
 
-    // Title
-    html += '<h3 class="card-title" title="Click to view full details">' + escapeHtml(session.title) + '</h3>';
-
-    // Meta (Speaker, Location, Track)
-    html += '<div class="card-meta">';
-    if (session.presenter) {
-      let presenterText = escapeHtml(session.presenter);
-      if (session.affiliation) presenterText += ' — ' + escapeHtml(session.affiliation);
-      html += '<div class="card-meta-item"><i class="bx bx-user"></i> ' + presenterText + '</div>';
-    }
-    if (session.location) {
-      html += '<div class="card-meta-item"><i class="bx bx-map"></i> ' + escapeHtml(session.location) + '</div>';
-    }
-    if (session.track) {
-      html += '<div class="card-meta-item"><i class="bx bx-purchase-tag"></i> ' + escapeHtml(session.track) + '</div>';
-    }
-    html += '</div>';
-
-    // Links (Paper, Evaluate)
     if (session.paper_url || (session.evaluation_url && showEval)) {
-      html += '<div class="card-links">';
+      html += '    <div class="session-links-row">';
       if (session.paper_url) {
         html += '<a href="' + escapeHtml(session.paper_url) + '" target="_blank" rel="noopener" class="card-link">' +
-                '<i class="bx bx-link-external"></i> View Paper</a>';
+                '<i class="bx bx-link-external"></i> Paper</a>';
       }
       if (session.evaluation_url && showEval) {
         html += '<a href="' + escapeHtml(session.evaluation_url) + '" target="_blank" rel="noopener" class="card-link">' +
                 '<i class="bx bx-edit"></i> Evaluate</a>';
       }
-      html += '</div>';
+      html += '    </div>';
     }
+    html += '  </div>';
 
-    // Expandable sections (Abstract, Bio, Menu)
+    html += '</div>'; // End .session-main-row
+
+    // Expandable Drawers (Full Width Below Main Row)
     if (session.description) {
       html += '<div class="card-expandable" id="desc-' + session.id + '">' +
-              '<div class="card-description">' + escapeHtml(session.description) + '</div></div>';
+              '<div class="card-description"><strong style="display:block;margin-bottom:6px;color:var(--color-primary);"><i class="bx bx-file"></i> Abstract:</strong>' + escapeHtml(session.description) + '</div></div>';
     }
     if (session.bio) {
       html += '<div class="card-expandable" id="bio-' + session.id + '">' +
