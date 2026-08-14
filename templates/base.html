@@ -59,13 +59,15 @@
         {% if settings.custom_heading_font %}--font-heading: '{{ settings.custom_heading_font }}', sans-serif;{% endif %}
         {% if settings.custom_body_font %}--font-body: '{{ settings.custom_body_font }}', sans-serif;{% endif %}
     }
-    {% if settings.custom_bg_path %}
-    .theme-custom body, .theme-custom .schedule-main {
-        background-image: url("{{ url_for('static', filename='uploads/' + settings.custom_bg_path) }}");
-        background-size: cover;
-        background-attachment: fixed;
-    }
     {% endif %}
+    {% if settings.custom_bg_path %}
+    body {
+        background-image: url("{{ url_for('static', filename='uploads/' + settings.custom_bg_path) }}") !important;
+        background-size: cover !important;
+        background-attachment: fixed !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+    }
     {% endif %}
     </style>
     {% endif %}
