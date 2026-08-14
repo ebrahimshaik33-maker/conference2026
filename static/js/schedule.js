@@ -1000,7 +1000,7 @@
           return;
         }
 
-        // Expand/collapse abstract/menu
+        // Expand/collapse abstract/bio/menu
         const expandBtn = e.target.closest('.card-expand-btn');
         if (expandBtn) {
           const targetId = expandBtn.dataset.target;
@@ -1018,6 +1018,20 @@
             target.style.maxHeight = target.scrollHeight + 'px';
           }
           return;
+        }
+
+        // Title click -> Open Rich Session Modal
+        const cardTitle = e.target.closest('.card-title');
+        if (cardTitle) {
+          const card = cardTitle.closest('.session-card');
+          if (card) {
+            const sid = parseInt(card.dataset.sessionId);
+            const session = state.sessions.find((s) => s.id === sid);
+            if (session) {
+              renderSessionModal(session);
+              return;
+            }
+          }
         }
 
         // Empty state clear filters
