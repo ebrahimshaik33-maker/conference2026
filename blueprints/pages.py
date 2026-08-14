@@ -43,15 +43,20 @@ def favicon():
 
 
 @pages_bp.route('/')
-def index():
-    settings = {s.key: s.value for s in Setting.query.all()}
-    return render_template('index.html', settings=settings)
-
-
 @pages_bp.route('/landing')
 @pages_bp.route('/conference-corner')
 def landing():
     return render_template('landing.html')
+
+
+@pages_bp.route('/programme')
+@pages_bp.route('/schedule')
+@pages_bp.route('/app')
+@pages_bp.route('/event')
+@pages_bp.route('/demo')
+def index():
+    settings = {s.key: s.value for s in Setting.query.all()}
+    return render_template('index.html', settings=settings)
 
 
 @pages_bp.route('/admin')
