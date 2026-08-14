@@ -52,7 +52,6 @@
                 </label>
             </div>
         </div>
-        </div>
 
         <div class="form-grid">
             <div class="form-group">
@@ -83,6 +82,7 @@
                     </div>
                 </label>
             </div>
+        </div>
         <div class="form-group">
             <label for="settingFooterText">Footer Copyright Text</label>
             <input type="text" id="settingFooterText" class="form-input" placeholder="e.g. &copy; Durban University of Technology &middot; Digital Programme" value="{{ settings.footer_text | default('') }}">
@@ -446,26 +446,6 @@
                     </div>
                 </div>
 
-                <!-- Background Image -->
-                <div class="form-group">
-                    <label for="settingCustomBg">Background Image <span class="form-helper-inline">(optional)</span></label>
-                    <div class="file-upload-area" id="customBgUploadArea">
-                        <div class="upload-preview" id="customBgPreview">
-                            {% if settings.custom_bg_path %}
-                            <img src="{{ url_for('static', filename='uploads/' + settings.custom_bg_path) }}" alt="Background image">
-                            {% else %}
-                            <i class='bx bx-image-add'></i>
-                            <span>Drop image or click to upload</span>
-                            {% endif %}
-                        </div>
-                        <input type="file" id="settingCustomBg" accept=".png,.jpg,.jpeg,.webp" class="file-input">
-                        <div class="upload-actions">
-                            <button type="button" class="btn btn-secondary btn-sm" id="resetCustomBgBtn">Remove</button>
-                        </div>
-                    </div>
-                    <span class="form-helper">Full-page background image. For best results, use a 1920×1080 image.</span>
-                </div>
-
                 <!-- Live Mini Preview -->
                 <div class="ctb-preview-wrap">
                     <label>Live Preview</label>
@@ -478,6 +458,28 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- Background Image (available for all themes) -->
+        <div class="form-group">
+            <div class="advanced-themes-header">
+                <label>Background Image <span class="form-helper-inline">(optional)</span></label>
+                <span class="form-helper" style="margin-top:0;">Overlays a full-page image behind any theme. For best results, use a 1920×1080 image.</span>
+            </div>
+            <div class="file-upload-area" id="customBgUploadArea">
+                <div class="upload-preview" id="customBgPreview">
+                    {% if settings.custom_bg_path %}
+                    <img src="{{ url_for('static', filename='uploads/' + settings.custom_bg_path) }}" alt="Background image">
+                    {% else %}
+                    <i class='bx bx-image-add'></i>
+                    <span>Drop image or click to upload</span>
+                    {% endif %}
+                </div>
+                <input type="file" id="settingCustomBg" accept=".png,.jpg,.jpeg,.webp" class="file-input">
+                <div class="upload-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" id="resetCustomBgBtn">Remove</button>
+                </div>
             </div>
         </div>
 
