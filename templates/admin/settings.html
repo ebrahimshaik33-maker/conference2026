@@ -31,53 +31,7 @@
             <label for="settingEventDescription">Event Description</label>
             <textarea id="settingEventDescription" class="form-textarea" rows="3">{{ settings.event_description | default('') }}</textarea>
         </div>
-        <!-- Layout -->
-        <div class="form-group">
-            <div class="advanced-themes-header">
-                <label>Schedule Layout</label>
-                <span class="form-helper" style="margin-top:0;">Controls how sessions are displayed on the public programme page</span>
-            </div>
-            <div class="layout-picker" id="layoutPicker">
-                <label class="layout-option {% if settings.layout == 'timeline' or not settings.layout %}layout-option-active{% endif %}">
-                    <input type="radio" name="layout" value="timeline" {% if settings.layout == 'timeline' or not settings.layout %}checked{% endif %}>
-                    <div class="layout-preview">
-                        <div class="lp-time-row"><span class="lp-time">09:00</span><div class="lp-card lp-card-tall"></div></div>
-                        <div class="lp-time-row"><span class="lp-time">10:00</span><div class="lp-card"></div></div>
-                        <div class="lp-time-row"><span class="lp-time">10:30</span><div class="lp-card lp-card-tall"></div></div>
-                    </div>
-                    <div class="layout-label">
-                        <strong>Timeline</strong>
-                        <span>Session cards stacked by time. Best for mobile.</span>
-                    </div>
-                </label>
-                <label class="layout-option {% if settings.layout == 'compact' %}layout-option-active{% endif %}">
-                    <input type="radio" name="layout" value="compact" {% if settings.layout == 'compact' %}checked{% endif %}>
-                    <div class="layout-preview">
-                        <div class="lp-list-row"><span class="lp-time">09:00</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
-                        <div class="lp-list-row"><span class="lp-time">09:45</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
-                        <div class="lp-list-row lp-list-break"><span class="lp-time">10:30</span><span class="lp-list-title lp-list-title-break"></span><span class="lp-list-room"></span></div>
-                        <div class="lp-list-row"><span class="lp-time">11:00</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
-                        <div class="lp-list-row"><span class="lp-time">11:45</span><span class="lp-list-title"></span><span class="lp-list-room"></span></div>
-                    </div>
-                    <div class="layout-label">
-                        <strong>Compact List</strong>
-                        <span>Dense rows. Great for scanning many sessions quickly.</span>
-                    </div>
-                </label>
-                <label class="layout-option {% if settings.layout == 'grid' %}layout-option-active{% endif %}">
-                    <input type="radio" name="layout" value="grid" {% if settings.layout == 'grid' %}checked{% endif %}>
-                    <div class="layout-preview">
-                        <div class="lp-grid-header"><span></span><span class="lp-col-head"></span><span class="lp-col-head"></span><span class="lp-col-head"></span></div>
-                        <div class="lp-grid-row"><span class="lp-time">09:00</span><div class="lp-grid-cell lp-grid-cell-span"></div><div class="lp-grid-cell"></div><div class="lp-grid-cell lp-grid-cell-span"></div></div>
-                        <div class="lp-grid-row"><span class="lp-time">10:00</span><div class="lp-grid-cell"></div><div class="lp-grid-cell lp-grid-cell-span"></div><div class="lp-grid-cell"></div></div>
-                    </div>
-                    <div class="layout-label">
-                        <strong>Track Grid</strong>
-                        <span>Columns by track. Auto-switches to Timeline on mobile.</span>
-                    </div>
-                </label>
-            </div>
-        </div>
+
         <div class="form-grid">
             <div class="form-group">
                 <label class="toggle-label">
