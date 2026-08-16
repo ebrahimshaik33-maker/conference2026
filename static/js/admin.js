@@ -19,6 +19,7 @@
     WIPE_ALL: '/api/sessions/wipe-all',
     RESET_LOGO: '/api/settings/reset-logo',
     RESET_BANNER: '/api/settings/reset-banner',
+    RESET_FOOTER_BANNER: '/api/settings/reset-footer-banner',
     RESET_CUSTOM_BG: '/api/settings/reset-custom-bg',
   };
 
@@ -841,10 +842,16 @@
           formData.append('logo', logoInput.files[0]);
         }
 
-        // Banner
+        // Header Banner
         const bannerInput = $('#settingBanner');
         if (bannerInput && bannerInput.files.length > 0) {
           formData.append('banner', bannerInput.files[0]);
+        }
+
+        // Footer Banner
+        const footerBannerInput = $('#settingFooterBanner');
+        if (footerBannerInput && footerBannerInput.files.length > 0) {
+          formData.append('footer_banner', footerBannerInput.files[0]);
         }
 
         const res = await apiFetch(API.SETTINGS, {
@@ -954,7 +961,7 @@
       });
     }
 
-    // Reset logo/banner
+    // Reset logo/banners
     const resetLogo = $('#resetLogoBtn');
     if (resetLogo) {
       resetLogo.addEventListener('click', async (e) => {
@@ -976,15 +983,29 @@
         e.stopPropagation();
         const res = await apiFetch(API.RESET_BANNER, { method: 'POST' });
         if (res) {
-          showToast('Banner reset', 'success');
+          showToast('Header banner reset', 'success');
           const preview = $('#bannerPreview');
           if (preview) preview.innerHTML = '<i class="bx bx-image-add"></i><span>Drop image or click to upload</span>';
         }
       });
     }
 
+    const resetFooterBanner = $('#resetFooterBannerBtn');
+    if (resetFooterBanner) {
+      resetFooterBanner.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const res = await apiFetch(API.RESET_FOOTER_BANNER, { method: 'POST' });
+        if (res) {
+          showToast('Footer banner reset', 'success');
+          const preview = $('#footerBannerPreview');
+          if (preview) preview.innerHTML = '<i class="bx bx-image-add"></i><span>Drop image or click to upload</span>';
+        }
+      });
+    }
+
     // Image preview on select
-    ['settingLogo', 'settingBanner'].forEach((id) => {
+    ['settingLogo', 'settingBanner', 'settingFooterBanner'].forEach((id) => {
       const input = $('#' + id);
       if (input) {
         input.addEventListener('change', () => {

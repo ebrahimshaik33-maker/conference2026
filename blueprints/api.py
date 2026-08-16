@@ -605,7 +605,7 @@ def update_settings():
     changes = {}
 
     # Handle file uploads
-    for file_key in ('logo', 'banner', 'favicon', 'custom_bg'):
+    for file_key in ('logo', 'banner', 'footer_banner', 'favicon', 'custom_bg'):
         if file_key in request.files:
             file = request.files[file_key]
             if file and file.filename:
@@ -702,7 +702,24 @@ def reset_banner():
     _log_audit('RESET_BANNER', {})
     db.session.commit()
 
-    return jsonify({'status': 'success', 'message': 'Banner reset to default'})
+    return jsonify({'status': 'success', 'message': 'Header banner reset to default'})
+
+
+@api_bp.route('/settings/reset-footer-banner', methods=['POST'])
+@login_required
+@validate_csrf
+def reset_footer_banner():
+    setting = db.session.get(Setting, 'footer_banner_path')
+    if setting and setting.value:
+        old_file = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'], setting.value)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+        setting.value = ''
+
+    _log_audit('RESET_FOOTER_BANNER', {})
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'Footer banner reset to default'})
 
 
 @api_bp.route('/settings/reset-custom-bg', methods=['POST'])

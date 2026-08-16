@@ -219,9 +219,10 @@
 <!-- Footer -->
 <footer class="site-footer">
     <div class="footer-inner">
-        {% if settings.banner_path and settings.show_footer_banner != 'false' %}
+        {% set footer_img = settings.footer_banner_path or settings.banner_path %}
+        {% if footer_img and settings.show_footer_banner != 'false' %}
         <div class="footer-banner-container">
-            <img src="{{ url_for('static', filename='uploads/' + settings.banner_path) }}" alt="Event banner" loading="lazy" class="footer-hero-banner">
+            <img src="{{ url_for('static', filename='uploads/' + footer_img) }}" alt="Footer Banner" loading="lazy" class="footer-hero-banner">
         </div>
         {% endif %}
         <p class="footer-text">

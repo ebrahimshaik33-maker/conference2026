@@ -648,11 +648,11 @@
                 <span class="form-helper">Max 400×200px, PNG/JPG/SVG/WEBP, 5MB max</span>
             </div>
             <div class="form-group">
-                <label for="settingBanner">Banner</label>
+                <label for="settingBanner">Top Header Banner</label>
                 <div class="file-upload-area" id="bannerUploadArea">
                     <div class="upload-preview" id="bannerPreview">
                         {% if settings.banner_path %}
-                        <img src="{{ url_for('static', filename='uploads/' + settings.banner_path) }}" alt="Current banner">
+                        <img src="{{ url_for('static', filename='uploads/' + settings.banner_path) }}" alt="Current header banner">
                         {% else %}
                         <i class='bx bx-image-add'></i>
                         <span>Drop image or click to upload</span>
@@ -663,7 +663,28 @@
                         <button type="button" class="btn btn-secondary btn-sm" id="resetBannerBtn">Reset</button>
                     </div>
                 </div>
-                <span class="form-helper">Max 2000×400px, PNG/JPG/SVG/WEBP, 5MB max</span>
+                <span class="form-helper">Top hero banner (Max 2000×400px, PNG/JPG/SVG/WEBP, 5MB max)</span>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="settingFooterBanner">Bottom Footer Banner</label>
+                <div class="file-upload-area" id="footerBannerUploadArea">
+                    <div class="upload-preview" id="footerBannerPreview">
+                        {% if settings.footer_banner_path %}
+                        <img src="{{ url_for('static', filename='uploads/' + settings.footer_banner_path) }}" alt="Current footer banner">
+                        {% else %}
+                        <i class='bx bx-image-add'></i>
+                        <span>Drop image or click to upload</span>
+                        {% endif %}
+                    </div>
+                    <input type="file" id="settingFooterBanner" accept=".png,.jpg,.jpeg,.svg,.webp" class="file-input">
+                    <div class="upload-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" id="resetFooterBannerBtn">Reset</button>
+                    </div>
+                </div>
+                <span class="form-helper">Bottom banner, e.g. sponsor logos / closing banner (Max 2000×400px, PNG/JPG/SVG/WEBP, 5MB max)</span>
             </div>
         </div>
 
