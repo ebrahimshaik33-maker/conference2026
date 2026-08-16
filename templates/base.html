@@ -51,13 +51,19 @@
     {% if settings.theme == 'theme-custom' %}
     .theme-custom {
         {% if settings.custom_bg %}--color-bg: {{ settings.custom_bg }};--color-bg-secondary: {{ settings.custom_bg }};{% endif %}
-        {% if settings.custom_surface %}--color-surface: {{ settings.custom_surface }};--color-surface-hover: {{ settings.custom_surface }};{% endif %}
-        {% if settings.custom_primary %}--color-primary: {{ settings.custom_primary }};--color-accent: {{ settings.custom_primary }};{% endif %}
+        {% if settings.custom_surface %}--color-surface: {{ settings.custom_surface }};--color-surface-hover: {{ settings.custom_surface }};--card-bg: {{ settings.custom_surface }};--input-bg: {{ settings.custom_surface }};{% endif %}
+        {% if settings.custom_primary %}--color-primary: {{ settings.custom_primary }};--color-accent: {{ settings.custom_primary }};--input-focus: {{ settings.custom_primary }};{% endif %}
         {% if settings.custom_accent %}--color-accent: {{ settings.custom_accent }};{% endif %}
-        {% if settings.custom_text %}--color-text: {{ settings.custom_text }};--color-text-secondary: {{ settings.custom_text }};{% endif %}
+        {% if settings.custom_text %}--color-text: {{ settings.custom_text }};--color-text-secondary: {{ settings.custom_text }};--input-text: {{ settings.custom_text }};{% endif %}
         {% if settings.custom_header_bg %}--header-bg: {{ settings.custom_header_bg }};{% endif %}
         {% if settings.custom_heading_font %}--font-heading: '{{ settings.custom_heading_font }}', sans-serif;{% endif %}
         {% if settings.custom_body_font %}--font-body: '{{ settings.custom_body_font }}', sans-serif;{% endif %}
+    }
+    .theme-custom select option,
+    .theme-custom .form-select option,
+    .theme-custom .filter-select option {
+        background-color: {{ settings.custom_surface | default(settings.custom_bg | default('#1e293b')) }} !important;
+        color: {{ settings.custom_text | default('#f8fafc') }} !important;
     }
     {% endif %}
     {% if settings.custom_bg_path %}

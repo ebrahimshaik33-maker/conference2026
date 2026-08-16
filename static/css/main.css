@@ -653,14 +653,56 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
     transition: border-color var(--duration-fast) var(--ease-standard);
 }
-.filter-select:focus {
+.filter-select:focus,
+.form-select:focus,
+select:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
-    border-color: var(--input-focus);
+    border-color: var(--input-focus, var(--color-primary));
 }
-.filter-select option {
-    background-color: var(--color-bg-secondary, #111219);
-    color: var(--input-text, #ffffff);
+
+select option,
+.form-select option,
+.filter-select option,
+optgroup {
+    background-color: var(--color-bg-secondary, #151b2d);
+    color: var(--color-text, #f8fafc);
+    padding: 8px 12px;
+}
+
+/* Light themes explicit option colors */
+body.theme-light select option,
+body.theme-light .form-select option,
+body.theme-light .filter-select option,
+body.theme-adv-light select option,
+body.theme-adv-light .form-select option,
+body.theme-adv-light .filter-select option,
+body.theme-wedding-elegant select option,
+body.theme-wedding-elegant .form-select option,
+body.theme-wedding-elegant .filter-select option,
+body.theme-corporate-blue select option,
+body.theme-corporate-blue .form-select option,
+body.theme-corporate-blue .filter-select option,
+body.theme-academic-gold select option,
+body.theme-academic-gold .form-select option,
+body.theme-academic-gold .filter-select option,
+body.theme-emerald-forest select option,
+body.theme-emerald-forest .form-select option,
+body.theme-emerald-forest .filter-select option,
+body.theme-rose-garden select option,
+body.theme-rose-garden .form-select option,
+body.theme-rose-garden .filter-select option,
+body.theme-uct select option,
+body.theme-uct .form-select option,
+body.theme-uct .filter-select option,
+body.theme-stellenbosch select option,
+body.theme-stellenbosch .form-select option,
+body.theme-stellenbosch .filter-select option,
+body.theme-up select option,
+body.theme-up .form-select option,
+body.theme-up .filter-select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
 }
 
 .search-input-wrapper {

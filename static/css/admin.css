@@ -565,6 +565,14 @@
     cursor: pointer;
 }
 
+select option,
+.form-select option,
+optgroup {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    padding: 8px 12px;
+}
+
 .form-textarea { resize: vertical; line-height: 1.6; }
 
 .form-helper {
