@@ -3039,7 +3039,11 @@ body.layout-grid .time-slot-group {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 12px;
+    align-items: center;
+    transform: translateX(-50%);
+    text-align: center;
+    padding: 0;
+    pointer-events: none;
 }
 
 .epg-time-tick span {
@@ -3047,15 +3051,20 @@ body.layout-grid .time-slot-group {
     font-weight: 700;
     color: var(--color-primary);
     font-family: var(--font-heading);
+    white-space: nowrap;
+    margin-bottom: 5px;
+    letter-spacing: 0.02em;
 }
 
 .epg-tick-line {
     position: absolute;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 2px;
-    height: 10px;
+    height: 12px;
     background: var(--color-primary);
+    border-radius: 1px;
 }
 
 .epg-rows-container {
@@ -3114,7 +3123,9 @@ body.layout-grid .time-slot-group {
     bottom: 0;
     width: 1px;
     background: var(--color-border);
+    opacity: 0.6;
     pointer-events: none;
+    transform: translateX(-50%);
 }
 
 .epg-card-item {

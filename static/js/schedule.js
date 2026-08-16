@@ -759,8 +759,9 @@
     const endHour = Math.ceil(globalMaxMins / 60);
     const totalHours = Math.max(endHour - startHour, 3);
 
-    const HOUR_WIDTH = 280; // px per hour for spacious cards
-    const totalWidth = totalHours * HOUR_WIDTH;
+    const START_OFFSET = 48; // px start breathing room from sticky track column
+    const HOUR_WIDTH = 300; // px per hour for spacious cards
+    const totalWidth = totalHours * HOUR_WIDTH + START_OFFSET + 48;
 
     const content = document.createElement('div');
     content.className = 'schedule-content epg-matrix-container';
@@ -773,7 +774,7 @@
     html += '  <div class="epg-track-header-cell"><i class="bx bx-slider-alt"></i> Agenda Tracks</div>';
     html += '  <div class="epg-time-axis" style="width: ' + totalWidth + 'px;">';
     for (let h = startHour; h <= endHour; h++) {
-      const offset = (h - startHour) * HOUR_WIDTH;
+      const offset = START_OFFSET + (h - startHour) * HOUR_WIDTH;
       const hourStr = (h < 10 ? '0' + h : '' + h) + ':00';
       html += '    <div class="epg-time-tick" style="left: ' + offset + 'px;">';
       html += '      <span>' + hourStr + '</span>';
@@ -796,7 +797,7 @@
 
       // Vertical background grid lines
       for (let h = startHour; h <= endHour; h++) {
-        const offset = (h - startHour) * HOUR_WIDTH;
+        const offset = START_OFFSET + (h - startHour) * HOUR_WIDTH;
         html += '    <div class="epg-grid-line" style="left: ' + offset + 'px;"></div>';
       }
 
@@ -806,9 +807,9 @@
         let eMins = parseTimeToMins(s.end_time);
         if (!eMins || eMins <= sMins) eMins = sMins + 45;
 
-        const left = ((sMins - (startHour * 60)) / 60) * HOUR_WIDTH;
+        const left = START_OFFSET + ((sMins - (startHour * 60)) / 60) * HOUR_WIDTH;
         const durationMins = Math.max(eMins - sMins, 25);
-        const width = Math.max((durationMins / 60) * HOUR_WIDTH - 12, 175);
+        const width = Math.max((durationMins / 60) * HOUR_WIDTH - 14, 185);
 
         const isBookmarked = state.bookmarks.some((b) => b.id === s.id);
         const typeLabel = (TYPE_CONFIG[s.type] || TYPE_CONFIG.general).label;
