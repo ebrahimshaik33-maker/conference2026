@@ -16,6 +16,7 @@ api_bp = Blueprint('api', __name__)
 ALLOWED_SESSION_TYPES = {'session', 'keynote', 'break', 'panel', 'workshop', 'general'}
 ALLOWED_STATUSES = {'', 'cancelled', 'delayed', 'moved'}
 ALLOWED_IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.svg', '.webp'}
+ALLOWED_PAPER_EXTENSIONS = {'.pdf', '.doc', '.docx', '.ppt', '.pptx', '.txt', '.rtf', '.odt'}
 
 
 def _normalize_time(t):
@@ -541,6 +542,50 @@ def upload_csv():
             'skipped': skipped,
             'skipped_rows': skipped_rows
         }
+    })
+
+
+@api_bp.route('/upload_paper', methods=['POST'])
+@login_required
+@validate_csrf
+def upload_paper():
+    if 'file' not in request.files:
+        return jsonify({'status': 'error', 'message': 'No file provided'}), 400
+
+    file = request.files['file']
+    if not file or not file.filename:
+        return jsonify({'status': 'error', 'message': 'No file selected'}), 400
+
+    orig_filename = secure_filename(file.filename)
+    ext = os.path.splitext(orig_filename)[1].lower()
+
+    if ext not in ALLOWED_PAPER_EXTENSIONS:
+        return jsonify({
+            'status': 'error',
+            'message': f'Invalid file format ({ext}). Allowed: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF'
+        }), 400
+
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    base_name = os.path.splitext(orig_filename)[0][:35]
+    new_filename = f'paper_{timestamp}_{base_name}{ext}'
+
+    upload_dir = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'])
+    os.makedirs(upload_dir, exist_ok=True)
+    filepath = os.path.join(upload_dir, new_filename)
+
+    try:
+        file.save(filepath)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Failed to save paper: {str(e)}'}), 500
+
+    file_url = f'/static/uploads/{new_filename}'
+    _log_audit('UPLOAD_PAPER', {'filename': new_filename, 'original': file.filename})
+
+    return jsonify({
+        'status': 'success',
+        'url': file_url,
+        'filename': orig_filename,
+        'saved_as': new_filename
     })
 
 

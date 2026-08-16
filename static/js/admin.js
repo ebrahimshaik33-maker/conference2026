@@ -12,6 +12,7 @@
     AUDIT: '/api/admin/audit-log',
     CSV_UPLOAD: '/api/upload_csv',
     CSV_EXPORT: '/api/sessions/export/csv',
+    UPLOAD_PAPER: '/api/upload_paper',
     DB_BACKUP: '/api/admin/export-db-backup',
     BULK_DELETE: '/api/sessions/bulk-delete',
     BULK_STATUS: '/api/sessions/bulk-status',
@@ -454,6 +455,66 @@
       desc.addEventListener('input', () => { charCount.textContent = desc.value.length; });
     }
 
+    // Paper File Upload Handling
+    const paperUploadBtn = $('#sessionPaperUploadBtn');
+    const paperFileInput = $('#sessionPaperFileInput');
+    const paperFileIndicator = $('#paperFileIndicator');
+    const paperClearBtn = $('#sessionPaperClearBtn');
+    const paperUrlInput = $('#sessionPaperUrl');
+
+    if (paperUploadBtn && paperFileInput) {
+      paperUploadBtn.addEventListener('click', () => {
+        paperFileInput.click();
+      });
+
+      paperFileInput.addEventListener('change', async () => {
+        const file = paperFileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('csrf_token', CSRF);
+
+        paperUploadBtn.disabled = true;
+        paperUploadBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Uploading...';
+
+        try {
+          const res = await apiFetch(API.UPLOAD_PAPER, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (res && res.status === 'success') {
+            if (paperUrlInput) paperUrlInput.value = res.url;
+            if (paperFileIndicator) {
+              paperFileIndicator.innerHTML = '<i class="bx bxs-file-pdf"></i> ' + escapeHtml(res.filename) + ' <span class="badge badge-success" style="margin-left:4px;font-size:0.75rem;">Uploaded</span>';
+              paperFileIndicator.style.display = 'inline-flex';
+            }
+            if (paperClearBtn) paperClearBtn.style.display = 'inline-flex';
+            showToast('Paper uploaded successfully!', 'success');
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to upload paper file', 'error');
+        } finally {
+          paperUploadBtn.disabled = false;
+          paperUploadBtn.innerHTML = '<i class="bx bx-cloud-upload"></i> Upload Paper File (PDF, DOCX, PPTX)';
+        }
+      });
+    }
+
+    if (paperClearBtn) {
+      paperClearBtn.addEventListener('click', () => {
+        if (paperUrlInput) paperUrlInput.value = '';
+        if (paperFileInput) paperFileInput.value = '';
+        if (paperFileIndicator) {
+          paperFileIndicator.textContent = '';
+          paperFileIndicator.style.display = 'none';
+        }
+        paperClearBtn.style.display = 'none';
+        showToast('Paper attachment cleared', 'info');
+      });
+    }
+
     // Bulk actions
     const bulkDeleteBtn = $('#bulkDeleteBtn');
     if (bulkDeleteBtn) {
@@ -520,6 +581,13 @@
     $('#sessionId').value = '';
     $('#descCharCount').textContent = '0';
 
+    const paperFileIndicator = $('#paperFileIndicator');
+    const paperClearBtn = $('#sessionPaperClearBtn');
+    const paperFileInput = $('#sessionPaperFileInput');
+    if (paperFileInput) paperFileInput.value = '';
+    if (paperFileIndicator) { paperFileIndicator.textContent = ''; paperFileIndicator.style.display = 'none'; }
+    if (paperClearBtn) paperClearBtn.style.display = 'none';
+
     // Populate suggestions
     populateDatalist('#locationSuggestions', allSessions.map((s) => s.location).filter(Boolean));
     populateDatalist('#trackSuggestions', allSessions.map((s) => s.track).filter(Boolean));
@@ -548,6 +616,15 @@
         $('#sessionMovedTo').value = session.moved_to || '';
         $('#sessionDisplayOrder').value = session.display_order || 0;
         $('#descCharCount').textContent = (session.description || '').length;
+
+        if (session.paper_url && session.paper_url.includes('/static/uploads/paper_')) {
+          const fileNameOnly = session.paper_url.split('/').pop().replace(/^paper_\d+_/, '');
+          if (paperFileIndicator) {
+            paperFileIndicator.innerHTML = '<i class="bx bxs-file-pdf text-primary"></i> Attached: <strong>' + escapeHtml(fileNameOnly) + '</strong>';
+            paperFileIndicator.style.display = 'inline-flex';
+          }
+          if (paperClearBtn) paperClearBtn.style.display = 'inline-flex';
+        }
 
         if (session.type === 'break') $('#menuDetailsGroup').style.display = '';
         if (session.status === 'moved') $('#movedToGroup').style.display = '';

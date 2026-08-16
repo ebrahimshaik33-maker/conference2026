@@ -200,17 +200,31 @@
                 <span class="form-error" id="sessionMeetingUrlError"></span>
             </div>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="sessionPaperUrl">Paper URL</label>
-                    <input type="url" id="sessionPaperUrl" class="form-input" placeholder="https://...">
-                    <span class="form-error" id="sessionPaperUrlError"></span>
+            <div class="form-group">
+                <label for="sessionPaperUrl">Session Paper / Slides / Handout</label>
+                <div class="paper-upload-box">
+                    <div class="paper-upload-btn-row">
+                        <input type="file" id="sessionPaperFileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" style="display:none;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="sessionPaperUploadBtn">
+                            <i class="bx bx-cloud-upload"></i> Upload Paper File (PDF, DOCX, PPTX)
+                        </button>
+                        <span class="paper-file-indicator" id="paperFileIndicator" style="display:none;"></span>
+                        <button type="button" class="btn btn-sm btn-icon text-danger" id="sessionPaperClearBtn" style="display:none;" title="Remove uploaded paper">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </div>
+                    <div class="paper-url-input-row" style="margin-top: 8px;">
+                        <span class="form-helper-inline" style="display:block;margin-bottom:4px;">Or enter an external paper URL:</span>
+                        <input type="url" id="sessionPaperUrl" class="form-input" placeholder="https://doi.org/... or /static/uploads/...">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="sessionEvalUrl">Evaluation URL</label>
-                    <input type="url" id="sessionEvalUrl" class="form-input" placeholder="https://...">
-                    <span class="form-error" id="sessionEvalUrlError"></span>
-                </div>
+                <span class="form-error" id="sessionPaperUrlError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="sessionEvalUrl">Evaluation / Feedback URL</label>
+                <input type="url" id="sessionEvalUrl" class="form-input" placeholder="https://forms.gle/... or https://eval...">
+                <span class="form-error" id="sessionEvalUrlError"></span>
             </div>
 
             <div class="form-grid">
