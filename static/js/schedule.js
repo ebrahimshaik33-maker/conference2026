@@ -295,18 +295,62 @@
     const jumpBtn = $('#ltJumpBtn');
     if (!trackerWrap || !titleEl || !metaEl) return;
 
+    // Check if organizer disabled Live Session Tracker in Admin Settings
+    if (state.settings && state.settings.show_live_tracker === 'false') {
+      trackerWrap.style.display = 'none';
+      activeLiveSessionId = null;
+      $$('.session-card, .epg-card-item').forEach(card => card.classList.remove('session-live-active'));
+      return;
+    }
+
     if (!state.sessions || state.sessions.length === 0) {
       trackerWrap.style.display = 'none';
+      activeLiveSessionId = null;
       return;
     }
 
     const now = new Date();
+    let isTodayConferenceDay = false;
+    let conferenceDayNumber = null;
+
+    // ── STRICT DATE VERIFICATION ──
+    // Checks if today's real calendar date falls within the conference dates
+    if (state.settings && state.settings.event_start_date) {
+      const dateParts = state.settings.event_start_date.split('-');
+      if (dateParts.length === 3) {
+        const startY = parseInt(dateParts[0], 10);
+        const startM = parseInt(dateParts[1], 10) - 1;
+        const startD = parseInt(dateParts[2], 10);
+
+        const confStart = new Date(startY, startM, startD, 0, 0, 0, 0);
+        const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+
+        const diffMs = todayZero.getTime() - confStart.getTime();
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
+        const totalDays = parseInt(state.settings.event_days, 10) || 4;
+
+        if (diffDays >= 1 && diffDays <= totalDays) {
+          isTodayConferenceDay = true;
+          conferenceDayNumber = diffDays;
+        }
+      }
+    }
+
+    // If today is NOT during the active conference dates, keep tracker completely hidden
+    if (!isTodayConferenceDay || !conferenceDayNumber) {
+      trackerWrap.style.display = 'none';
+      activeLiveSessionId = null;
+      $$('.session-card, .epg-card-item').forEach(card => card.classList.remove('session-live-active'));
+      return;
+    }
+
     const nowMins = now.getHours() * 60 + now.getMinutes();
 
-    // Check sessions on current active day
-    const daySessions = state.sessions.filter(s => s.day === state.currentDay && s.status !== 'cancelled');
+    // Check sessions on today's active conference day
+    const daySessions = state.sessions.filter(s => s.day === conferenceDayNumber && s.status !== 'cancelled');
     if (daySessions.length === 0) {
       trackerWrap.style.display = 'none';
+      activeLiveSessionId = null;
       return;
     }
 
@@ -349,7 +393,12 @@
                          `<div class="lt-progress-bar"><div class="lt-progress-fill" style="width:${progressPercent}%"></div></div>`;
       if (jumpBtn) {
         jumpBtn.innerHTML = '<i class="bx bx-target-lock"></i> Jump to Live Session';
-        jumpBtn.onclick = () => jumpToSession(liveSession.id);
+        jumpBtn.onclick = () => {
+          if (state.currentDay !== conferenceDayNumber) {
+            switchDay(conferenceDayNumber);
+          }
+          jumpToSession(liveSession.id);
+        };
       }
     } else if (upNextSession && minDiffToNext <= 60) {
       activeLiveSessionId = upNextSession.id;
@@ -363,17 +412,22 @@
                          `<span class="lt-meta-item lt-time-countdown"><i class="bx bx-alarm"></i> In ${minDiffToNext} minutes</span>`;
       if (jumpBtn) {
         jumpBtn.innerHTML = '<i class="bx bx-target-lock"></i> View Session';
-        jumpBtn.onclick = () => jumpToSession(upNextSession.id);
+        jumpBtn.onclick = () => {
+          if (state.currentDay !== conferenceDayNumber) {
+            switchDay(conferenceDayNumber);
+          }
+          jumpToSession(upNextSession.id);
+        };
       }
     } else {
       trackerWrap.style.display = 'none';
       activeLiveSessionId = null;
     }
 
-    // Update active highlight on cards
+    // Update active highlight on cards (only when viewing today's conference day)
     $$('.session-card, .epg-card-item').forEach(card => {
       const id = parseInt(card.getAttribute('data-id') || (card.id ? card.id.replace('session-', '') : '0'), 10);
-      if (liveSession && id === liveSession.id) {
+      if (liveSession && id === liveSession.id && state.currentDay === conferenceDayNumber) {
         card.classList.add('session-live-active');
       } else {
         card.classList.remove('session-live-active');

@@ -778,6 +778,7 @@
           show_track_filter: ($('#settingShowTrack') || {}).checked ? 'true' : 'false',
           show_evaluation_links: ($('#settingShowEval') || {}).checked ? 'true' : 'false',
           show_calendar_links: ($('#settingShowCalendar') || {}).checked ? 'true' : 'false',
+          show_live_tracker: ($('#settingShowLiveTracker') || {}).checked ? 'true' : 'false',
           footer_text: ($('#settingFooterText') || {}).value || '',
           show_top_banner: ($('#settingShowTopBanner') || {}).checked ? 'true' : 'false',
           show_footer_banner: ($('#settingShowFooterBanner') || {}).checked ? 'true' : 'false',
