@@ -11,11 +11,9 @@
 {% block admin_content %}
 <!-- Session Toolbar -->
 <div class="session-toolbar">
-    <div class="toolbar-left">
-        <h3 class="section-title">
-            Sessions
-            <span class="session-count" id="sessionCount"></span>
-        </h3>
+    <div class="toolbar-left" style="display: flex; align-items: center; gap: 10px;">
+        <h3 class="section-title" style="margin: 0;">Sessions</h3>
+        <span class="session-count-badge" id="sessionCount"></span>
     </div>
     <div class="toolbar-right">
         <button class="btn btn-primary" id="addSessionBtn">
