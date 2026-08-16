@@ -639,7 +639,7 @@ def update_settings():
     text_keys = [
         'event_title', 'event_subtitle', 'event_description',
         'event_start_date', 'event_days', 'theme', 'layout', 'ui_style',
-        'show_track_filter', 'show_evaluation_links',
+        'show_track_filter', 'show_evaluation_links', 'show_calendar_links',
         'announcement', 'announcement_type', 'footer_text',
         'show_top_banner', 'show_footer_banner',
         # Branding

@@ -827,6 +827,7 @@
     const tc = TYPE_CONFIG[session.type] || TYPE_CONFIG.general;
     const isBookmarked = state.bookmarks.some((b) => b.id === session.id);
     const showEval = state.settings.show_evaluation_links !== 'false';
+    const showCal = state.settings.show_calendar_links !== 'false';
 
     let timeRange = session.start_time || '';
     if (session.end_time) timeRange += ' – ' + session.end_time;
@@ -921,15 +922,17 @@
     html += '        <span>' + (isBookmarked ? 'Bookmarked' : 'Add to Bookmarks') + '</span>';
     html += '      </button>';
 
-    html += '      <div class="modal-cal-wrap">';
-    html += '        <button class="btn btn-secondary modal-btn-cal" id="modalCalDropdownBtn" type="button">';
-    html += '          <i class="bx bx-calendar-plus"></i> <span>Add to Calendar</span> <i class="bx bx-chevron-down"></i>';
-    html += '        </button>';
-    html += '        <div class="modal-cal-menu" id="modalCalMenu" style="display:none;">';
-    html += '          <a href="' + generateGoogleCalendarUrl(session) + '" target="_blank" rel="noopener" class="modal-cal-item"><i class="bx bxl-google"></i> Google Calendar</a>';
-    html += '          <button type="button" class="modal-cal-item" id="modalCalIcsBtn"><i class="bx bx-download"></i> Apple / Outlook (.ics)</button>';
-    html += '        </div>';
-    html += '      </div>';
+    if (showCal) {
+      html += '      <div class="modal-cal-wrap">';
+      html += '        <button class="btn btn-secondary modal-btn-cal" id="modalCalDropdownBtn" type="button">';
+      html += '          <i class="bx bx-calendar-plus"></i> <span>Add to Calendar</span> <i class="bx bx-chevron-down"></i>';
+      html += '        </button>';
+      html += '        <div class="modal-cal-menu" id="modalCalMenu" style="display:none;">';
+      html += '          <a href="' + generateGoogleCalendarUrl(session) + '" target="_blank" rel="noopener" class="modal-cal-item"><i class="bx bxl-google"></i> Google Calendar</a>';
+      html += '          <button type="button" class="modal-cal-item" id="modalCalIcsBtn"><i class="bx bx-download"></i> Apple / Outlook (.ics)</button>';
+      html += '        </div>';
+      html += '      </div>';
+    }
 
     if (session.meeting_url) {
       html += '      <a href="' + escapeHtml(session.meeting_url) + '" target="_blank" rel="noopener" class="btn btn-primary modal-btn-join"><i class="bx bx-video"></i> Join Online (Teams/Zoom)</a>';
@@ -1015,6 +1018,7 @@
     const tc = TYPE_CONFIG[session.type] || TYPE_CONFIG.general;
     const isBookmarked = state.bookmarks.some((b) => b.id === session.id);
     const showEval = state.settings.show_evaluation_links !== 'false';
+    const showCal = state.settings.show_calendar_links !== 'false';
 
     let timeStr = session.start_time || '';
     if (session.end_time) timeStr += ' – ' + session.end_time;
@@ -1088,8 +1092,10 @@
       html += '<a href="' + escapeHtml(session.paper_url) + '" target="_blank" rel="noopener" class="card-link">' +
               '<i class="bx bx-link-external"></i> Paper</a>';
     }
-    html += '<a href="' + generateGoogleCalendarUrl(session) + '" target="_blank" rel="noopener" class="card-link" title="Add to Google Calendar">' +
-            '<i class="bx bx-calendar-plus"></i> Cal</a>';
+    if (showCal) {
+      html += '<a href="' + generateGoogleCalendarUrl(session) + '" target="_blank" rel="noopener" class="card-link" title="Add to Google Calendar">' +
+              '<i class="bx bx-calendar-plus"></i> Cal</a>';
+    }
     if (session.evaluation_url && showEval) {
       html += '<a href="' + escapeHtml(session.evaluation_url) + '" target="_blank" rel="noopener" class="card-link">' +
               '<i class="bx bx-edit"></i> Evaluate</a>';
