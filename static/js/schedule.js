@@ -78,6 +78,7 @@
       renderSchedule();
       updateBookmarkUI();
       updatePrintBtn();
+      updateLiveTracker();
 
       // Track filter visibility
       const trackGroup = $('#trackFilterGroup');
@@ -112,6 +113,291 @@
     state.refreshTimer = setInterval(() => {
       fetchData();
     }, REFRESH_INTERVAL_MS);
+
+    // Update live session status tracker every 25s
+    setInterval(() => {
+      updateLiveTracker();
+    }, 25000);
+  }
+
+  // ─── CALENDAR INTEGRATION (.ICS & GOOGLE CALENDAR) ───────
+  function escapeICS(str) {
+    if (!str) return '';
+    return str.replace(/\\/g, '\\\\')
+              .replace(/;/g, '\\;')
+              .replace(/,/g, '\\,')
+              .replace(/\n/g, '\\n')
+              .replace(/\r/g, '');
+  }
+
+  function getSessionDate(dayNumber) {
+    if (state.settings && state.settings.event_start_date) {
+      const d = new Date(state.settings.event_start_date + 'T00:00:00');
+      if (!isNaN(d.getTime())) {
+        d.setDate(d.getDate() + ((parseInt(dayNumber, 10) || 1) - 1));
+        return d;
+      }
+    }
+    const today = new Date();
+    today.setDate(today.getDate() + ((parseInt(dayNumber, 10) || 1) - 1));
+    return today;
+  }
+
+  function formatICSDate(date, timeStr) {
+    const [h, m] = (timeStr || '09:00').split(':').map(Number);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(isNaN(h) ? 9 : h).padStart(2, '0');
+    const mins = String(isNaN(m) ? 0 : m).padStart(2, '0');
+    return `${year}${month}${day}T${hours}${mins}00`;
+  }
+
+  function addMinutesToTime(timeStr, minsToAdd) {
+    const [h, m] = (timeStr || '09:00').split(':').map(Number);
+    let total = (isNaN(h) ? 9 : h) * 60 + (isNaN(m) ? 0 : m) + minsToAdd;
+    const newH = Math.floor(total / 60) % 24;
+    const newM = total % 60;
+    return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+  }
+
+  function generateGoogleCalendarUrl(session) {
+    const sessionDate = getSessionDate(session.day);
+    const startIso = formatICSDate(sessionDate, session.start_time);
+    const endIso = session.end_time ? formatICSDate(sessionDate, session.end_time) : formatICSDate(sessionDate, addMinutesToTime(session.start_time, 45));
+    
+    let details = '';
+    if (session.presenter) details += `Presenter: ${session.presenter}\n`;
+    if (session.affiliation) details += `Affiliation: ${session.affiliation}\n\n`;
+    if (session.description) details += `${session.description}\n\n`;
+    if (session.meeting_url) details += `Online Stream (Teams/Zoom): ${session.meeting_url}\n`;
+    if (session.paper_url) details += `Paper / Presentation: ${session.paper_url}\n`;
+    
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: session.title,
+      dates: `${startIso}/${endIso}`,
+      details: details.trim(),
+      location: session.location || (state.settings.event_title || 'Conference Venue'),
+    });
+    
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  }
+
+  function downloadCalendarFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  }
+
+  function exportSingleSessionICS(session) {
+    const sessionDate = getSessionDate(session.day);
+    const startIso = formatICSDate(sessionDate, session.start_time);
+    const endIso = session.end_time ? formatICSDate(sessionDate, session.end_time) : formatICSDate(sessionDate, addMinutesToTime(session.start_time, 45));
+    const nowIso = formatICSDate(new Date(), '00:00') + 'Z';
+    
+    let desc = '';
+    if (session.presenter) desc += `Presenter: ${session.presenter}\\n`;
+    if (session.affiliation) desc += `Affiliation: ${session.affiliation}\\n\\n`;
+    if (session.description) desc += `${session.description.replace(/\n/g, '\\n')}\\n\\n`;
+    if (session.meeting_url) desc += `Online Meeting: ${session.meeting_url}\\n`;
+    if (session.paper_url) desc += `Paper / Slides: ${session.paper_url}\\n`;
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Conference Corner//Event Calendar//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:session-${session.id}-${startIso}@conferencecorner.co.za`,
+      `DTSTAMP:${nowIso}`,
+      `DTSTART:${startIso}`,
+      `DTEND:${endIso}`,
+      `SUMMARY:${escapeICS(session.title)}`,
+      `DESCRIPTION:${escapeICS(desc)}`,
+      `LOCATION:${escapeICS(session.location || state.settings.event_title || 'Conference Venue')}`,
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const cleanTitle = (session.title || 'session').slice(0, 30).replace(/[^a-z0-9]/gi, '_');
+    downloadCalendarFile(`${cleanTitle}.ics`, icsContent);
+    showToast('Downloaded session to Calendar (.ics)', 'success');
+  }
+
+  function exportAllBookmarksICS() {
+    const bookmarkedSessions = state.sessions.filter(s => state.bookmarks.some(b => b.id === s.id));
+    if (!bookmarkedSessions || bookmarkedSessions.length === 0) {
+      showToast('No bookmarks found to export', 'info');
+      return;
+    }
+    const nowIso = formatICSDate(new Date(), '00:00') + 'Z';
+    
+    const events = bookmarkedSessions.map(session => {
+      const sessionDate = getSessionDate(session.day);
+      const startIso = formatICSDate(sessionDate, session.start_time);
+      const endIso = session.end_time ? formatICSDate(sessionDate, session.end_time) : formatICSDate(sessionDate, addMinutesToTime(session.start_time, 45));
+      
+      let desc = '';
+      if (session.presenter) desc += `Presenter: ${session.presenter}\\n`;
+      if (session.affiliation) desc += `Affiliation: ${session.affiliation}\\n\\n`;
+      if (session.description) desc += `${session.description.replace(/\n/g, '\\n')}\\n\\n`;
+      if (session.meeting_url) desc += `Online Meeting: ${session.meeting_url}\\n`;
+      if (session.paper_url) desc += `Paper / Slides: ${session.paper_url}\\n`;
+
+      return [
+        'BEGIN:VEVENT',
+        `UID:session-${session.id}-${startIso}@conferencecorner.co.za`,
+        `DTSTAMP:${nowIso}`,
+        `DTSTART:${startIso}`,
+        `DTEND:${endIso}`,
+        `SUMMARY:${escapeICS(session.title)}`,
+        `DESCRIPTION:${escapeICS(desc)}`,
+        `LOCATION:${escapeICS(session.location || state.settings.event_title || 'Conference Venue')}`,
+        'STATUS:CONFIRMED',
+        'END:VEVENT'
+      ].join('\r\n');
+    }).join('\r\n');
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Conference Corner//My Conference Schedule//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      events,
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    downloadCalendarFile('my_conference_itinerary.ics', icsContent);
+    showToast(`Exported ${bookmarkedSessions.length} bookmarked sessions to Calendar`, 'success');
+  }
+
+  // ─── LIVE CONFERENCE SESSION TRACKER ──────────────────────
+  let activeLiveSessionId = null;
+
+  function updateLiveTracker() {
+    const trackerWrap = $('#liveTrackerWrapper');
+    const badgeText = $('#ltBadgeText');
+    const badge = $('#ltBadge');
+    const titleEl = $('#ltTitle');
+    const metaEl = $('#ltMeta');
+    const jumpBtn = $('#ltJumpBtn');
+    if (!trackerWrap || !titleEl || !metaEl) return;
+
+    if (!state.sessions || state.sessions.length === 0) {
+      trackerWrap.style.display = 'none';
+      return;
+    }
+
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+
+    // Check sessions on current active day
+    const daySessions = state.sessions.filter(s => s.day === state.currentDay && s.status !== 'cancelled');
+    if (daySessions.length === 0) {
+      trackerWrap.style.display = 'none';
+      return;
+    }
+
+    let liveSession = null;
+    let upNextSession = null;
+    let minDiffToNext = Infinity;
+
+    daySessions.forEach(s => {
+      const sMins = parseTimeToMins(s.start_time);
+      let eMins = parseTimeToMins(s.end_time);
+      if (!eMins || eMins <= sMins) eMins = sMins + 45;
+
+      if (nowMins >= sMins && nowMins < eMins) {
+        liveSession = s;
+      } else if (nowMins < sMins) {
+        const diff = sMins - nowMins;
+        if (diff < minDiffToNext) {
+          minDiffToNext = diff;
+          upNextSession = s;
+        }
+      }
+    });
+
+    if (liveSession) {
+      activeLiveSessionId = liveSession.id;
+      trackerWrap.style.display = '';
+      if (badge) badge.className = 'lt-pulse-badge lt-live';
+      if (badgeText) badgeText.textContent = 'LIVE NOW';
+      
+      const sMins = parseTimeToMins(liveSession.start_time);
+      let eMins = parseTimeToMins(liveSession.end_time) || (sMins + 45);
+      const minsRemaining = Math.max(1, eMins - nowMins);
+      const totalDur = eMins - sMins;
+      const progressPercent = Math.min(100, Math.max(0, Math.round(((nowMins - sMins) / totalDur) * 100)));
+
+      titleEl.innerHTML = escapeHtml(liveSession.title);
+      metaEl.innerHTML = `<span class="lt-meta-item"><i class="bx bx-time"></i> ${escapeHtml(liveSession.start_time)} – ${escapeHtml(liveSession.end_time || '')}</span>` +
+                         (liveSession.location ? `<span class="lt-meta-item"><i class="bx bx-map-pin"></i> ${escapeHtml(liveSession.location)}</span>` : '') +
+                         `<span class="lt-meta-item lt-time-left"><i class="bx bx-hourglass"></i> ${minsRemaining}m remaining</span>` +
+                         `<div class="lt-progress-bar"><div class="lt-progress-fill" style="width:${progressPercent}%"></div></div>`;
+      if (jumpBtn) {
+        jumpBtn.innerHTML = '<i class="bx bx-target-lock"></i> Jump to Live Session';
+        jumpBtn.onclick = () => jumpToSession(liveSession.id);
+      }
+    } else if (upNextSession && minDiffToNext <= 60) {
+      activeLiveSessionId = upNextSession.id;
+      trackerWrap.style.display = '';
+      if (badge) badge.className = 'lt-pulse-badge lt-upcoming';
+      if (badgeText) badgeText.textContent = 'UP NEXT';
+
+      titleEl.innerHTML = escapeHtml(upNextSession.title);
+      metaEl.innerHTML = `<span class="lt-meta-item"><i class="bx bx-time"></i> Starts at ${escapeHtml(upNextSession.start_time)}</span>` +
+                         (upNextSession.location ? `<span class="lt-meta-item"><i class="bx bx-map-pin"></i> ${escapeHtml(upNextSession.location)}</span>` : '') +
+                         `<span class="lt-meta-item lt-time-countdown"><i class="bx bx-alarm"></i> In ${minDiffToNext} minutes</span>`;
+      if (jumpBtn) {
+        jumpBtn.innerHTML = '<i class="bx bx-target-lock"></i> View Session';
+        jumpBtn.onclick = () => jumpToSession(upNextSession.id);
+      }
+    } else {
+      trackerWrap.style.display = 'none';
+      activeLiveSessionId = null;
+    }
+
+    // Update active highlight on cards
+    $$('.session-card, .epg-card-item').forEach(card => {
+      const id = parseInt(card.getAttribute('data-id') || (card.id ? card.id.replace('session-', '') : '0'), 10);
+      if (liveSession && id === liveSession.id) {
+        card.classList.add('session-live-active');
+      } else {
+        card.classList.remove('session-live-active');
+      }
+    });
+  }
+
+  function jumpToSession(sessionId) {
+    const el = document.getElementById('session-' + sessionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('session-pulse-highlight');
+      setTimeout(() => el.classList.remove('session-pulse-highlight'), 2500);
+    } else {
+      openSessionModal(sessionId);
+    }
+  }
+
+  function switchDay(day) {
+    state.currentDay = day;
+    populateDayTabs();
+    populateFilters();
+    renderSchedule();
+    updateLiveTracker();
   }
 
   // ─── ANNOUNCEMENT ───────────────────────────────────────
@@ -331,6 +617,30 @@
         groupEl.appendChild(cardsContainer);
         content.appendChild(groupEl);
       });
+
+      if (state.showBookmarked && filtered.length > 0) {
+        const actionBar = document.createElement('div');
+        actionBar.className = 'bookmarks-action-bar';
+        actionBar.innerHTML = `
+          <div class="bab-left">
+            <i class="bx bxs-star"></i>
+            <span><strong>My Bookmarked Schedule</strong> (${filtered.length} sessions)</span>
+          </div>
+          <div class="bab-right">
+            <button class="btn btn-secondary btn-sm" id="exportAllBookmarksBtn" type="button">
+              <i class="bx bx-calendar-plus"></i> Export to Calendar (.ics)
+            </button>
+          </div>
+        `;
+        content.prepend(actionBar);
+
+        const expBtn = actionBar.querySelector('#exportAllBookmarksBtn');
+        if (expBtn) {
+          expBtn.addEventListener('click', () => {
+            exportAllBookmarksICS();
+          });
+        }
+      }
     }
 
     container.appendChild(content);
@@ -611,6 +921,16 @@
     html += '        <span>' + (isBookmarked ? 'Bookmarked' : 'Add to Bookmarks') + '</span>';
     html += '      </button>';
 
+    html += '      <div class="modal-cal-wrap">';
+    html += '        <button class="btn btn-secondary modal-btn-cal" id="modalCalDropdownBtn" type="button">';
+    html += '          <i class="bx bx-calendar-plus"></i> <span>Add to Calendar</span> <i class="bx bx-chevron-down"></i>';
+    html += '        </button>';
+    html += '        <div class="modal-cal-menu" id="modalCalMenu" style="display:none;">';
+    html += '          <a href="' + generateGoogleCalendarUrl(session) + '" target="_blank" rel="noopener" class="modal-cal-item"><i class="bx bxl-google"></i> Google Calendar</a>';
+    html += '          <button type="button" class="modal-cal-item" id="modalCalIcsBtn"><i class="bx bx-download"></i> Apple / Outlook (.ics)</button>';
+    html += '        </div>';
+    html += '      </div>';
+
     if (session.meeting_url) {
       html += '      <a href="' + escapeHtml(session.meeting_url) + '" target="_blank" rel="noopener" class="btn btn-primary modal-btn-join"><i class="bx bx-video"></i> Join Online (Teams/Zoom)</a>';
     }
@@ -645,6 +965,29 @@
         modalBookmark.classList.toggle('bookmarked', nowBookmarked);
         modalBookmark.querySelector('span').textContent = nowBookmarked ? 'Bookmarked' : 'Add to Bookmarks';
         modalBookmark.querySelector('i').className = 'bx ' + (nowBookmarked ? 'bxs-star' : 'bx-star');
+      });
+    }
+
+    const calDropdownBtn = modal.querySelector('#modalCalDropdownBtn');
+    const calMenu = modal.querySelector('#modalCalMenu');
+    const calIcsBtn = modal.querySelector('#modalCalIcsBtn');
+    if (calDropdownBtn && calMenu) {
+      calDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = calMenu.style.display !== 'none';
+        calMenu.style.display = isOpen ? 'none' : 'flex';
+      });
+      document.addEventListener('click', (e) => {
+        if (calMenu && !calMenu.contains(e.target) && e.target !== calDropdownBtn) {
+          calMenu.style.display = 'none';
+        }
+      });
+    }
+    if (calIcsBtn) {
+      calIcsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportSingleSessionICS(session);
+        if (calMenu) calMenu.style.display = 'none';
       });
     }
   }
@@ -736,22 +1079,22 @@
             '<i class="bx ' + (isBookmarked ? 'bxs-star' : 'bx-star') + '"></i></button>';
     html += '    </div>';
 
-    if (session.meeting_url || session.paper_url || (session.evaluation_url && showEval)) {
-      html += '    <div class="session-links-row">';
-      if (session.meeting_url) {
-        html += '<a href="' + escapeHtml(session.meeting_url) + '" target="_blank" rel="noopener" class="card-link card-link-meeting" title="Join online video stream (Teams / Zoom)">' +
-                '<i class="bx bx-video"></i> Join Online</a>';
-      }
-      if (session.paper_url) {
-        html += '<a href="' + escapeHtml(session.paper_url) + '" target="_blank" rel="noopener" class="card-link">' +
-                '<i class="bx bx-link-external"></i> Paper</a>';
-      }
-      if (session.evaluation_url && showEval) {
-        html += '<a href="' + escapeHtml(session.evaluation_url) + '" target="_blank" rel="noopener" class="card-link">' +
-                '<i class="bx bx-edit"></i> Evaluate</a>';
-      }
-      html += '    </div>';
+    html += '    <div class="session-links-row">';
+    if (session.meeting_url) {
+      html += '<a href="' + escapeHtml(session.meeting_url) + '" target="_blank" rel="noopener" class="card-link card-link-meeting" title="Join online video stream (Teams / Zoom)">' +
+              '<i class="bx bx-video"></i> Join Online</a>';
     }
+    if (session.paper_url) {
+      html += '<a href="' + escapeHtml(session.paper_url) + '" target="_blank" rel="noopener" class="card-link">' +
+              '<i class="bx bx-link-external"></i> Paper</a>';
+    }
+    html += '<a href="' + generateGoogleCalendarUrl(session) + '" target="_blank" rel="noopener" class="card-link" title="Add to Google Calendar">' +
+            '<i class="bx bx-calendar-plus"></i> Cal</a>';
+    if (session.evaluation_url && showEval) {
+      html += '<a href="' + escapeHtml(session.evaluation_url) + '" target="_blank" rel="noopener" class="card-link">' +
+              '<i class="bx bx-edit"></i> Evaluate</a>';
+    }
+    html += '    </div>';
     html += '  </div>';
 
     html += '</div>'; // End .session-main-row

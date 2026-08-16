@@ -3428,6 +3428,301 @@ body.layout-grid .time-slot-group {
     border-color: #eab308 !important;
 }
 
+/* ─── § 22. Live Conference Session Tracker Banner ─────────────── */
+.live-tracker-wrapper {
+    width: 100%;
+    max-width: 1280px;
+    margin: var(--space-3) auto var(--space-2) auto;
+    padding: 0 var(--space-4);
+    animation: fadeInSlide 0.3s ease-out;
+}
+
+.live-tracker-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: 12px 18px;
+    background: var(--card-bg, rgba(255, 255, 255, 0.05));
+    backdrop-filter: var(--card-backdrop, blur(16px));
+    -webkit-backdrop-filter: var(--card-backdrop, blur(16px));
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #10b981;
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.lt-status-col {
+    flex-shrink: 0;
+}
+
+.lt-pulse-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.lt-pulse-badge.lt-live {
+    background: rgba(16, 185, 129, 0.18);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.lt-pulse-badge.lt-upcoming {
+    background: rgba(245, 158, 11, 0.18);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.lt-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: ltPulse 1.8s infinite;
+}
+
+@keyframes ltPulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.lt-content-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.lt-session-title {
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lt-session-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+    flex-wrap: wrap;
+}
+
+.lt-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.lt-time-left {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.lt-time-countdown {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.lt-progress-bar {
+    width: 100px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-left: 4px;
+}
+
+.lt-progress-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.lt-actions-col {
+    flex-shrink: 0;
+}
+
+.lt-jump-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Active Live Card Highlighting */
+.session-live-active {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25), 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    position: relative;
+}
+
+.session-live-active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #10b981;
+    border-radius: 6px 6px 0 0;
+}
+
+@keyframes sessionPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(232, 168, 56, 0.7);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(232, 168, 56, 0.4);
+        transform: scale(1.01);
+    }
+}
+
+.session-pulse-highlight {
+    animation: sessionPulse 1.2s ease-in-out 2;
+}
+
+/* ─── § 23. Add to Calendar Dropdown & Bookmarks Actions ───────── */
+.modal-cal-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.modal-btn-cal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-cal-menu {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    min-width: 200px;
+    background: var(--color-bg-secondary, #151b2d);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    padding: 6px 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-cal-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.modal-cal-item:hover {
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.08));
+    color: var(--color-primary);
+}
+
+.modal-cal-item i {
+    font-size: 1.1rem;
+}
+
+/* Bookmarks Action Bar */
+.bookmarks-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: 12px 18px;
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    border-radius: var(--radius-lg, 12px);
+    margin-bottom: var(--space-4);
+}
+
+.bab-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.bab-left i {
+    color: #eab308;
+    font-size: 1.2rem;
+}
+
+.bab-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .live-tracker-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .lt-actions-col {
+        width: 100%;
+    }
+    .lt-jump-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .bookmarks-action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .bab-right {
+        width: 100%;
+    }
+    .bab-right button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 
 
 
