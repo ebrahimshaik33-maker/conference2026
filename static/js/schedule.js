@@ -611,6 +611,9 @@
     html += '        <span>' + (isBookmarked ? 'Bookmarked' : 'Add to Bookmarks') + '</span>';
     html += '      </button>';
 
+    if (session.meeting_url) {
+      html += '      <a href="' + escapeHtml(session.meeting_url) + '" target="_blank" rel="noopener" class="btn btn-primary modal-btn-join"><i class="bx bx-video"></i> Join Online (Teams/Zoom)</a>';
+    }
     const paperLink = session.paper_url || session.presentation_url;
     if (paperLink) {
       html += '      <a href="' + escapeHtml(paperLink) + '" target="_blank" rel="noopener" class="btn btn-secondary"><i class="bx bx-link-external"></i> View Paper / Slides</a>';
@@ -733,8 +736,12 @@
             '<i class="bx ' + (isBookmarked ? 'bxs-star' : 'bx-star') + '"></i></button>';
     html += '    </div>';
 
-    if (session.paper_url || (session.evaluation_url && showEval)) {
+    if (session.meeting_url || session.paper_url || (session.evaluation_url && showEval)) {
       html += '    <div class="session-links-row">';
+      if (session.meeting_url) {
+        html += '<a href="' + escapeHtml(session.meeting_url) + '" target="_blank" rel="noopener" class="card-link card-link-meeting" title="Join online video stream (Teams / Zoom)">' +
+                '<i class="bx bx-video"></i> Join Online</a>';
+      }
       if (session.paper_url) {
         html += '<a href="' + escapeHtml(session.paper_url) + '" target="_blank" rel="noopener" class="card-link">' +
                 '<i class="bx bx-link-external"></i> Paper</a>';

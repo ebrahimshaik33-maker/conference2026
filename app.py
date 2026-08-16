@@ -85,6 +85,17 @@ def create_app(config=None):
     # Initialize database
     with app.app_context():
         db.create_all()
+        # Auto-migrate session columns if missing in existing SQLite database
+        try:
+            from sqlalchemy import text
+            with db.engine.connect() as conn:
+                result = conn.execute(text("PRAGMA table_info(sessions)"))
+                columns = [row[1] for row in result]
+                if 'meeting_url' not in columns:
+                    conn.execute(text("ALTER TABLE sessions ADD COLUMN meeting_url VARCHAR(500)"))
+                    conn.commit()
+        except Exception as e:
+            app.logger.warning(f"Session column auto-migration notice: {e}")
         seed_defaults()
 
     # Register blueprints

@@ -102,6 +102,9 @@ def _validate_session_data(data, is_update=False):
     if 'evaluation_url' in data and data['evaluation_url']:
         data['evaluation_url'] = _normalize_url(data['evaluation_url'])
 
+    if 'meeting_url' in data and data['meeting_url']:
+        data['meeting_url'] = _normalize_url(data['meeting_url'])
+
     return errors
 
 
@@ -214,6 +217,7 @@ def create_session():
         type=data.get('type', 'session'),
         paper_url=data.get('paper_url', ''),
         evaluation_url=data.get('evaluation_url', ''),
+        meeting_url=data.get('meeting_url', ''),
         description=data.get('description', ''),
         menu_details=data.get('menu_details', ''),
         status=data.get('status', ''),
@@ -249,7 +253,7 @@ def update_session(session_id):
     # Update fields
     updatable = [
         'day', 'start_time', 'end_time', 'title', 'presenter', 'affiliation',
-        'bio', 'location', 'track', 'type', 'paper_url', 'evaluation_url',
+        'bio', 'location', 'track', 'type', 'paper_url', 'evaluation_url', 'meeting_url',
         'description', 'menu_details', 'status', 'moved_to', 'display_order'
     ]
     for field in updatable:
@@ -342,8 +346,8 @@ def export_csv():
 
     headers = [
         'id', 'day', 'start_time', 'end_time', 'title', 'presenter', 'affiliation',
-        'bio', 'location', 'track', 'type', 'paper_url', 'evaluation_url', 'description',
-        'menu_details', 'status', 'moved_to', 'display_order'
+        'bio', 'location', 'track', 'type', 'paper_url', 'evaluation_url', 'meeting_url',
+        'description', 'menu_details', 'status', 'moved_to', 'display_order'
     ]
     writer.writerow(headers)
 
@@ -352,8 +356,8 @@ def export_csv():
             s.id, s.day, s.start_time, s.end_time or '', s.title,
             s.presenter or '', s.affiliation or '', s.bio or '', s.location or '',
             s.track or '', s.type, s.paper_url or '', s.evaluation_url or '',
-            s.description or '', s.menu_details or '', s.status or '',
-            s.moved_to or '', s.display_order
+            s.meeting_url or '', s.description or '', s.menu_details or '',
+            s.status or '', s.moved_to or '', s.display_order
         ])
 
     output.seek(0)
@@ -473,6 +477,14 @@ def upload_csv():
 
         # Build session data
         bio_val = row.get('bio', '') or row.get('short_bio', '') or row.get('speaker_bio', '') or row.get('presenter_bio', '')
+        meeting_val = (
+            row.get('meeting_url', '') or row.get('zoom_url', '') or
+            row.get('teams_url', '') or row.get('stream_url', '') or
+            row.get('online_url', '') or row.get('video_url', '') or
+            row.get('join_url', '') or row.get('meeting_link', '') or
+            row.get('teams_link', '') or row.get('zoom_link', '') or
+            row.get('online_link', '') or row.get('virtual_url', '')
+        )
         session_data = {
             'day': day_int,
             'start_time': norm_start,
@@ -486,6 +498,7 @@ def upload_csv():
             'type': session_type,
             'paper_url': row.get('paper_url', ''),
             'evaluation_url': row.get('evaluation_url', ''),
+            'meeting_url': meeting_val,
             'description': row.get('description', ''),
             'menu_details': row.get('menu_details', ''),
             'status': status,

@@ -36,6 +36,7 @@ class Session(db.Model):
     type = db.Column(db.String(20), nullable=False, default='session')
     paper_url = db.Column(db.String(500), nullable=True)
     evaluation_url = db.Column(db.String(500), nullable=True)
+    meeting_url = db.Column(db.String(500), nullable=True)
     description = db.Column(db.Text, nullable=True)
     menu_details = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default='')
@@ -64,6 +65,7 @@ class Session(db.Model):
             'type': self.type,
             'paper_url': self.paper_url,
             'evaluation_url': self.evaluation_url,
+            'meeting_url': self.meeting_url,
             'description': self.description,
             'menu_details': self.menu_details,
             'status': self.status,

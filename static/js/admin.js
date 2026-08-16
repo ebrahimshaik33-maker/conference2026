@@ -541,6 +541,7 @@
         $('#sessionTrack').value = session.track || '';
         $('#sessionDescription').value = session.description || '';
         $('#sessionMenuDetails').value = session.menu_details || '';
+        $('#sessionMeetingUrl').value = session.meeting_url || '';
         $('#sessionPaperUrl').value = session.paper_url || '';
         $('#sessionEvalUrl').value = session.evaluation_url || '';
         $('#sessionStatus').value = session.status || '';
@@ -595,6 +596,7 @@
       track: $('#sessionTrack').value.trim(),
       description: $('#sessionDescription').value.trim(),
       menu_details: $('#sessionMenuDetails').value.trim(),
+      meeting_url: $('#sessionMeetingUrl').value.trim(),
       paper_url: $('#sessionPaperUrl').value.trim(),
       evaluation_url: $('#sessionEvalUrl').value.trim(),
       status: $('#sessionStatus').value,
@@ -628,6 +630,7 @@
             title: 'sessionTitle',
             type: 'sessionType',
             status: 'sessionStatus',
+            meeting_url: 'sessionMeetingUrl',
             paper_url: 'sessionPaperUrl',
             evaluation_url: 'sessionEvalUrl',
           };
